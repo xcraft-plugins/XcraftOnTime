@@ -4,19 +4,26 @@ public class UserData {
     private long playTime;
     private String joinedDate;
 
-    public long getPlayTime() {
+    public UserData() {
+
+    }
+
+    public UserData(long playTime, String joinedDate){
+        super();
+        this.playTime = playTime;
+        this.joinedDate = joinedDate;
+    }
+
+    public long getPlayTime(){
         return playTime;
     }
 
-    public void setPlayTime(long playTime) {
+    public void setPlayTime(long playTime){
         this.playTime = playTime;
     }
 
-    public String getJoinedDate() {
+    public String getJoinedDate(){
         return joinedDate;
     }
 
-    public void setJoinedDate(String joinedDate) {
-        this.joinedDate = joinedDate;
-    }
 }

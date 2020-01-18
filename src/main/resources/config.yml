@@ -1,0 +1,24 @@
+#SleepTimer is the time how long a new player has to be on the server to create a new file for him (0 = off)
+SleepTimer: 600000
+
+#Plugin Prefix
+PluginPrefix: "§f[§cOnTime§f] "
+
+PlayerName: "§6Name:§r§l "
+PlayTime: "§6Playtime:§r§l "
+PlayerJoinDate: "§6Joined at:§r§l "
+PlayTimeSinceLogin: "§6Playtime since login:§r§l "
+
+DaysValue: " Days "
+HoursValue: " Hours "
+MinutesValue: " Minutes "
+
+#Error Messages:
+NotAnIntegerError: "§4Please enter a valid number above 0."
+PlayerNotFoundError: "§4The specified player could not be found."
+CommandIsMissingArgsError: "§4Arguments are missing for this command."
+AmountHigherThanPlayTimeError: "§4The number indicated cannot be higher than the playing time. A player cannot have negative playing time."
+
+#SQLite
+DatabaseName: "ontimetracker"
+TableName: "ontimetracker-players"

@@ -5,6 +5,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.io.IOException;
+
 public class PlayerQuit implements Listener {
     private OntimeTracker main;
 
@@ -13,8 +15,8 @@ public class PlayerQuit implements Listener {
     }
 
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event){
-        main.configHandler.PlayerQuit(event.getPlayer());
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        main.databaseHandler.sqlPlayerQuit(event.getPlayer().getUniqueId());
     }
 }
 

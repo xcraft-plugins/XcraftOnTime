@@ -1,0 +1,14 @@
+name: OntimeTracker
+version: 1.0.0
+main: me.umbreon.ontimetracker.OntimeTracker
+api-version: 1.14
+Version: 1.0.0
+depend:
+  - Essentials
+authors:
+  - Umbreon
+
+commands:
+  ontime:
+    description: Default Page
+    aliases: ontimetracker

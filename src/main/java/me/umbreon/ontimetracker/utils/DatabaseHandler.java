@@ -6,7 +6,9 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.sql.*;
+
 import java.text.SimpleDateFormat;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -55,7 +57,7 @@ public class DatabaseHandler {
         }
     }
 
-    public void createNewPlayerEntry(Player player){
+    public void sqlCreateNewPlayerEntry(Player player){
         String entry = "INSERT INTO " + table + "(uuid, playtime, joindate) VALUES (?,?,?)";
 
         try {
@@ -78,7 +80,7 @@ public class DatabaseHandler {
             statement.setString(1, player.getUniqueId().toString());
             ResultSet rs = statement.executeQuery();
             if (!rs.next()){
-                createNewPlayerEntry(player);
+                sqlCreateNewPlayerEntry(player);
                 cache.put(player.getUniqueId(), Calendar.getInstance().getTime());
             } else {
                 cache.put(player.getUniqueId(), Calendar.getInstance().getTime());
@@ -96,6 +98,7 @@ public class DatabaseHandler {
             int playedTime = ((int) TimeUnit.SECONDS.convert(Calendar.getInstance().getTime().getTime() - cache.get(uuid).getTime(), TimeUnit.MILLISECONDS));
             statement.setInt(1, sqlGetPlayTime(uuid) + playedTime);
             statement.setString(2, uuid.toString());
+            statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -167,9 +170,27 @@ public class DatabaseHandler {
         PreparedStatement statement = null;
         try {
             statement = connection.prepareStatement(update);
-            statement.setInt(1, amount);
+            statement.setInt(1, amount + sqlGetPlayTime(target.getUniqueId()));
             statement.setString(2, target.getUniqueId().toString());
-            sender.sendMessage(config.getPluginPrefix() + "Added " + amount + " to Seconds" + target);
+            statement.executeUpdate();
+            sender.sendMessage(config.getPluginPrefix() + amount + " Sekunden wurdem dem Spieler " + target.getName() + " hinzugefügt.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sqlRemoveTime(Player sender, OfflinePlayer target, int amount){
+        String update = "UPDATE " + table + " SET playtime = ? WHERE uuid = ?";
+        PreparedStatement statement = null;
+        try {
+            if (!(amount>sqlGetPlayTime(target.getUniqueId()))){
+                statement = connection.prepareStatement(update);
+                statement.setInt(1, sqlGetPlayTime(target.getUniqueId()) - amount);
+                statement.setString(2, target.getUniqueId().toString());
+                statement.executeUpdate();
+            } else {
+                sender.sendMessage(config.getPluginPrefix() + config.getAmountHigherThanPlayTimeError());
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -198,11 +219,52 @@ public class DatabaseHandler {
         return joindate;
     }
 
-    public void sqlSaveAll(){
-        //Todo: What when the server crashes? The playtime shouldn't be lost
+    public void sqlSaveOnShutdown(){
         for (UUID uuid:cache.keySet()) {
             sqlPlayerQuit(uuid);
         }
         Bukkit.getLogger().info("[OntimeTracker] Saved all players.");
+    }
+
+    public void sqlSave(){
+        int SleepTimer = (int) config.getSleepTimer();
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(main, new Runnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getServer().getOnlinePlayers()){
+                    sqlPlayerQuit(player.getUniqueId());
+                    sqlPlayerJoin(player);
+                }
+            }
+        }, 0L, 20L*SleepTimer+1);
+    }
+
+    public void sqlGetTopTen(Player sender){
+        String select  = "SELECT playtime FROM " + table + " ORDER BY playtime";
+        PreparedStatement statement = null;
+        try {
+            statement = connection.prepareStatement(select);
+            ResultSet rs = statement.executeQuery();
+            int count = 0;
+            int top10Max = config.getTopListMax();
+            sender.sendMessage(config.getPluginPrefix() + "Top " + top10Max + config.getPlayerValues());
+            while (rs.next()){
+                if (count<top10Max){
+                    OfflinePlayer player = Bukkit.getOfflinePlayer(rs.getString("uuid"));
+                    String name = player.getName();
+                    int time = rs.getInt("playtime");
+                    long days = time / (24 * 3600);
+                    time = time % (24 * 3600);
+                    long hours = time / 3600;
+                    time %= 3600;
+                    long mins = time / 60 ;
+                    sender.sendMessage(config.getPluginPrefix() + name + ": " + days + config.getDaysValue() + hours + config.getHoursValue() + mins + config.getMinutesValue());
+                    count++;
+                }
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

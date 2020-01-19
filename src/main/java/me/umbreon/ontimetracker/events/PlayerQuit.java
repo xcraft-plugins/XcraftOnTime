@@ -1,11 +1,10 @@
 package me.umbreon.ontimetracker.events;
 
 import me.umbreon.ontimetracker.OntimeTracker;
+
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-
-import java.io.IOException;
 
 public class PlayerQuit implements Listener {
     private OntimeTracker main;

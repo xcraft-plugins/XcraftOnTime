@@ -12,3 +12,26 @@ commands:
   ontime:
     description: Default Page
     aliases: ontimetracker
+
+permissons:
+  xcraftontime.add:
+    description: Permission to add playtime.
+    default: op
+  xcraftontime.remove:
+    description: Permission to remove playtime.
+    default: op
+  xcraftontime.top:
+    description: Allows you to view the top 10 with the most playing time.
+    default: op
+  xcraftontime.check:
+    description: Allows the user to view his playing time.
+    default: true
+  xcraftontime.check.others:
+    description: Allows the user to view the playing time of others.
+    default: op
+  xcraftontime.check.*:
+    description: Allows the user to view his playing time and the playing time of others.
+    default: false
+    children:
+      xcraftontime.check: true
+      xcraftontime.check.others: true

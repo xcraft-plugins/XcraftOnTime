@@ -73,4 +73,12 @@ public class ConfigHandler {
     String getTableName(){
         return config.getString("TableName");
     }
+
+    int getTopListMax(){
+        return config.getInt("topListMax");
+    }
+
+    String getPlayerValues(){
+        return config.getString("PlayerValue");
+    }
 }

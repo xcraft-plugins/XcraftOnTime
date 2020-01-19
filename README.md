@@ -4,7 +4,7 @@ Tracks the online (non-afk) time of players on each server of the network
 Aliases: [ontime, ontimetracker]
 
 ##Commands:
-- /ontime <Player>
+- /ontime (Player)
 - /ontime add [Player] [Amount]
 - /ontime remove [Player] [Amount]
 - /ontime top
@@ -17,4 +17,4 @@ Aliases: [ontime, ontimetracker]
 - xcraftontime.top - Allows you to view the top 10 with the most playing time.
 
 
-<Optinal> [Required]
+(Optinal) [Required]

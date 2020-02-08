@@ -2,7 +2,6 @@ package me.umbreon.ontimetracker.events;
 
 import me.umbreon.ontimetracker.OntimeTracker;
 import me.umbreon.ontimetracker.utils.ConfigHandler;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,13 +28,13 @@ public class PlayerJoin implements Listener {
 
                 @Override
                 public void run() {
-                    main.databaseHandler.sqlPlayerJoin(player);
+                    main.databaseHandler.PlayerJoined(player);
                 }
 
             }, (SleepTimer % 3600) / 60);
 
         } else {
-            main.databaseHandler.sqlPlayerJoin(player);
+            main.databaseHandler.PlayerJoined(player);
         }
     }
 }

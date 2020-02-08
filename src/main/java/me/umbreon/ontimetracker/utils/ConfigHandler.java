@@ -5,6 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class ConfigHandler {
 
+    public boolean getDebugValue;
     JavaPlugin plugin;
     private FileConfiguration config;
 
@@ -81,4 +82,25 @@ public class ConfigHandler {
     String getPlayerValues(){
         return config.getString("PlayerValue");
     }
+
+    boolean getDebugValue() {
+        return config.getBoolean("debug");
+    }
+
+    String host(){
+        return config.getString("mysql.host");
+    }
+    String database(){
+        return config.getString("mysql.database");
+    }
+    String password(){
+        return config.getString("mysql.password");
+    }
+    String port(){
+        return config.getString("mysql.port");
+    }
+    String user(){
+        return config.getString("mysql.user");
+    }
+
 }

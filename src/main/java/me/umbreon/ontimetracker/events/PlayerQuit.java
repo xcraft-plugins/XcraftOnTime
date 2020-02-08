@@ -1,7 +1,6 @@
 package me.umbreon.ontimetracker.events;
 
 import me.umbreon.ontimetracker.OntimeTracker;
-
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -15,7 +14,7 @@ public class PlayerQuit implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        main.databaseHandler.sqlPlayerQuit(event.getPlayer().getUniqueId());
+        main.databaseHandler.PlayerQuitted(event.getPlayer().getUniqueId());
     }
 }
 

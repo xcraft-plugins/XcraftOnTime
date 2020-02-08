@@ -1,3 +1,5 @@
+# If Debug is set to "true" every event will get logged
+debug: true
 
 # Enable if AFK status to be checked, and AFK time NOT counted
 afkPlayerCheck: true
@@ -32,6 +34,10 @@ PlayerNotFoundError: "§4The specified player could not be found."
 CommandIsMissingArgsError: "§4Arguments are missing for this command."
 AmountHigherThanPlayTimeError: "§4The number indicated cannot be higher than the playing time. A player cannot have negative playing time."
 
-#SQLite
-DatabaseName: "ontimetracker"
-TableName: "ontimetracker-players"
+# MySQL
+mysql:
+  host: localhost
+  port: 3306
+  user: root
+  password:
+  database:

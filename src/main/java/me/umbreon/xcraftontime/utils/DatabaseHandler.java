@@ -1,6 +1,6 @@
-package me.umbreon.ontimetracker.utils;
+package me.umbreon.xcraftontime.utils;
 
-import me.umbreon.ontimetracker.OntimeTracker;
+import me.umbreon.xcraftontime.Ontime;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -16,18 +16,19 @@ import java.util.concurrent.TimeUnit;
 
 public class DatabaseHandler {
 
-    private OntimeTracker main;
+    private Ontime main;
+    private ConfigHandler config;
     private HashMap<UUID, java.util.Date> cache = new HashMap<UUID, Date>();
     private Connection connection;
-    private ConfigHandler config;
     private String table = "Ontime";
 
-    public DatabaseHandler(OntimeTracker ontimeTracker, ConfigHandler configHandler) {
-        this.main = ontimeTracker;
+
+    public DatabaseHandler(Ontime ontime, ConfigHandler configHandler) {
+        this.main = ontime;
         this.config = configHandler;
     }
 
-    public Connection createNewConnection() {
+    public Connection startup() {
         String host = config.host();
         String port = config.port();
         String database = config.database();
@@ -39,9 +40,18 @@ public class DatabaseHandler {
 
             String url = "jdbc:mysql://" + host + ":" + port + "/" + database;
             Connection connection = DriverManager.getConnection(url, user, password);
+
             if (config.getDebugValue()){
-                Bukkit.getLogger().info( table + " Successfully connected to database.");
+                Bukkit.getLogger().info( "[" + table + "] " + "Successfully connected to database.");
             }
+
+            connection.createStatement().execute("CREATE TABLE IF NOT EXISTS " + table + " (\n"
+                    + "uuid VARCHAR(50) PRIMARY KEY,\n"
+                    + "playtime INT(255) NOT NULL,\n"
+                    + "joined VARCHAR(30) NOT NULL\n"
+                    + ")"
+            );
+
             return connection;
         } catch (ClassNotFoundException | SQLException e) {
             Bukkit.getLogger().info(e.toString());
@@ -51,29 +61,17 @@ public class DatabaseHandler {
 
     private boolean checkConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {
-            connection = createNewConnection();
+            connection = startup();
 
             if (connection == null || connection.isClosed()) {
                 return false;
             }
-
-            execute("CREATE TABLE IF NOT EXISTS " + table + " (\n"
-                    + "    uuid VARCHAR(50) PRIMARY KEY,\n"
-                    + "    playtime INT(255) NOT NULL,\n"
-                    + "    joinDate VARCHAR(30) NOT NULL\n"
-                    + ")"
-            );
         }
         return true;
     }
 
-    private boolean execute(String sql) throws SQLException {
-        boolean success = connection.createStatement().execute(sql);
-        return success;
-    }
-
     private void createNewEntry(Player player){
-        String entry = "INSERT INTO " + table + "(uuid, playtime, joindate) VALUES (?,?,?)";
+        String entry = "INSERT INTO " + table + "(uuid, playtime, joined) VALUES (?,?,?)";
 
         try {
             if (checkConnection()){
@@ -84,7 +82,7 @@ public class DatabaseHandler {
                 statement.setString(3, createDate(player));
                 statement.executeUpdate();
                 if (debug()){
-                    Bukkit.getLogger().info(table + " Created new entry for player " + player.getName());
+                    Bukkit.getLogger().info("[" + table + "]" + " Created new entry for player " + player.getName());
                 }
             }
         } catch (SQLException e) {
@@ -92,7 +90,7 @@ public class DatabaseHandler {
         }
     }
 
-    public void PlayerJoined(Player player){
+    public void MySqlJoinEvent(Player player){
         String select = "SELECT uuid FROM " + table + " WHERE uuid = ?";
         try {
             if (checkConnection()){
@@ -112,15 +110,22 @@ public class DatabaseHandler {
         }
     }
 
-    public void PlayerQuitted(UUID uuid) {
+    public void MySqlQuitEvent(UUID uuid) {
         String update = "UPDATE " + table + " SET playtime = ? WHERE uuid = ?";
         PreparedStatement statement = null;
         try {
-            statement = connection.prepareStatement(update);
-            int playedTime = ((int) TimeUnit.SECONDS.convert(Calendar.getInstance().getTime().getTime() - cache.get(uuid).getTime(), TimeUnit.MILLISECONDS));
-            statement.setInt(1, getPlaytime(uuid) + playedTime);
-            statement.setString(2, uuid.toString());
-            statement.executeUpdate();
+            if (checkConnection()){
+                statement = connection.prepareStatement(update);
+                int playedTime;
+                if (cache.get(uuid) == null){
+                    playedTime = ((int) TimeUnit.SECONDS.convert(Calendar.getInstance().getTime().getTime(), TimeUnit.MILLISECONDS));
+                } else {
+                    playedTime = ((int) TimeUnit.SECONDS.convert(Calendar.getInstance().getTime().getTime() - cache.get(uuid).getTime(), TimeUnit.MILLISECONDS));
+                }
+                statement.setInt(1, getPlaytime(uuid) + playedTime);
+                statement.setString(2, uuid.toString());
+                statement.executeUpdate();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -158,7 +163,7 @@ public class DatabaseHandler {
             statement.setString(1, uuid.toString());
             ResultSet rs = statement.executeQuery();
             if (rs.next()){
-                joindate = rs.getString("joinDate");
+                joindate = rs.getString("joined");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -166,7 +171,7 @@ public class DatabaseHandler {
         return joindate;
     }
 
-    void checkPlayer(Player sender){
+    public void checkPlayer(Player sender){
         UUID uuid = sender.getUniqueId();
         int time = ((int) TimeUnit.SECONDS.convert(Calendar.getInstance().getTime().getTime() - cache.get(sender.getUniqueId()).getTime(), TimeUnit.MILLISECONDS) + getPlaytime(uuid));
         long TotalDays = time / (24 * 3600);
@@ -174,14 +179,14 @@ public class DatabaseHandler {
         long TotalHours = time / 3600;
         time %= 3600;
         long TotalMins = time / 60 ;
-        sender.sendMessage(config.getPluginPrefix() + config.getPlayerName() + sender.getDisplayName());
-        sender.sendMessage(config.getPluginPrefix() + config.getPlayTime() + TotalDays + config.getDaysValue() + TotalHours + config.getHoursValue() + TotalMins + config.getMinutesValue());
+        sender.sendMessage(config.getPluginPrefix() + " " + config.getPlayerName() + ChatColor.RESET + " " + sender.getDisplayName());
+        sender.sendMessage(config.getPluginPrefix() + " " + config.getPlayTime() + " " + TotalDays + " " + config.getDaysValue() + " " + TotalHours + " " + config.getHoursValue() + " " + TotalMins + " " + config.getMinutesValue());
         if (sender.hasPermission("ontimetracker.see.mydate")) {
-            sender.sendMessage(config.getPluginPrefix() + config.getJoinDate() + sqlGetJoinedDate(uuid));
+            sender.sendMessage(config.getPluginPrefix() + " " + config.getJoinDate() + " " + sqlGetJoinedDate(uuid));
         }
     }
 
-    void checkTarget(Player sender, OfflinePlayer target){
+    public void checkTarget(Player sender, OfflinePlayer target){
         UUID uuid = target.getUniqueId();
         if (target.isOnline()){
             int time = ((int) TimeUnit.SECONDS.convert(Calendar.getInstance().getTime().getTime() - cache.get(sender.getUniqueId()).getTime(), TimeUnit.MILLISECONDS) + getPlaytime(uuid));
@@ -190,10 +195,10 @@ public class DatabaseHandler {
             long TotalHours = time / 3600;
             time %= 3600;
             long TotalMins = time / 60 ;
-            sender.sendMessage(config.getPluginPrefix() + config.getPlayerName() + target.getName());
-            sender.sendMessage(config.getPluginPrefix() + config.getPlayTime() + TotalDays + config.getDaysValue() + TotalHours + config.getHoursValue() + TotalMins + config.getMinutesValue());
+            sender.sendMessage(config.getPluginPrefix() + " " + config.getPlayerName() + ChatColor.RESET + " " + target.getName());
+            sender.sendMessage(config.getPluginPrefix() + " " + config.getPlayTime() + " " + TotalDays + " " + config.getDaysValue() + " " + TotalHours + " " + config.getHoursValue() + " " + TotalMins + " " + config.getMinutesValue());
             if (sender.hasPermission("ontimetracker.see.othersdate")) {
-                sender.sendMessage(config.getPluginPrefix() + config.getJoinDate() + sqlGetJoinedDate(uuid));
+                sender.sendMessage(config.getPluginPrefix() + " " + config.getJoinDate() + " " + sqlGetJoinedDate(uuid));
             }
         } else {
             long time = getPlaytime(uuid);
@@ -202,15 +207,15 @@ public class DatabaseHandler {
             long TotalHours = time / 3600;
             time %= 3600;
             long TotalMins = time / 60 ;
-            sender.sendMessage(config.getPluginPrefix() + config.getPlayerName() + target.getName());
-            sender.sendMessage(config.getPluginPrefix() + config.getPlayTime() + TotalDays + config.getDaysValue() + TotalHours + config.getHoursValue() + TotalMins + config.getMinutesValue());
+            sender.sendMessage(config.getPluginPrefix() + " " + config.getPlayerName() + ChatColor.RESET + " " + target.getName());
+            sender.sendMessage(config.getPluginPrefix() + " " + config.getPlayTime() + " " + TotalDays + config.getDaysValue() + " " + TotalHours + " " + config.getHoursValue() + " " + TotalMins + " " + config.getMinutesValue());
             if (sender.hasPermission("ontimetracker.see.othersdate")) {
-                sender.sendMessage(config.getPluginPrefix() + config.getJoinDate() + sqlGetJoinedDate(uuid));
+                sender.sendMessage(config.getPluginPrefix() + " " + config.getJoinDate() + " " + sqlGetJoinedDate(uuid));
             }
         }
     }
 
-    void AddTime(Player sender, OfflinePlayer target, int amount){
+    public void AddTime(Player sender, OfflinePlayer target, int amount){
         String update = "UPDATE " + table + " SET playtime = ? WHERE uuid = ?";
         PreparedStatement statement = null;
         try {
@@ -231,7 +236,7 @@ public class DatabaseHandler {
         }
     }
 
-    void RemoveTime(Player sender, OfflinePlayer target, int amount){
+    public void RemoveTime(Player sender, OfflinePlayer target, int amount){
         String update = "UPDATE " + table + " SET playtime = ? WHERE uuid = ?";
         PreparedStatement statement = null;
         try {
@@ -264,7 +269,7 @@ public class DatabaseHandler {
 
     public void Shutdown(){
         for (UUID uuid:cache.keySet()) {
-            PlayerQuitted(uuid);
+            MySqlQuitEvent(uuid);
         }
         if (connection != null) {
             try {
@@ -273,7 +278,7 @@ public class DatabaseHandler {
                 Bukkit.getLogger().info(e.toString());
             }
         }
-        Bukkit.getLogger().info(table + " Saved all players.");
+        Bukkit.getLogger().info("[XcraftOntime] Saved all players.");
     }
 
     public void startTimedSaving(){
@@ -282,17 +287,17 @@ public class DatabaseHandler {
             @Override
             public void run() {
                 for (Player player : Bukkit.getServer().getOnlinePlayers()){
-                    PlayerQuitted(player.getUniqueId());
-                    PlayerJoined(player);
+                    MySqlQuitEvent(player.getUniqueId());
+                    MySqlJoinEvent(player);
                     if (debug()){
-                        Bukkit.getLogger().info(table +  "Saved all playtime");
+                        Bukkit.getLogger().info("[XcraftOntime] Saved all playtime");
                     }
                 }
             }
         }, 0L, 20L*SleepTimer+1);
     }
 
-    void topTen(Player sender){
+    public void topTen(Player sender){
         String select  = "SELECT playtime, uuid FROM " + table + " ORDER BY playtime DESC";
         PreparedStatement statement = null;
         try {
@@ -301,7 +306,7 @@ public class DatabaseHandler {
             int count = 0;
             int stat = 1;
             int top10Max = config.getTopListMax();
-            sender.sendMessage(config.getPluginPrefix() + "Spielzeitstatistik - Top " + top10Max + config.getPlayerValues());
+            sender.sendMessage(config.getPluginPrefix() + "Spielzeitstatistik - Top " + top10Max + " " + config.getPlayerValues());
             while (rs.next()){
                 if (count<top10Max){
                     OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("uuid")));
@@ -314,9 +319,9 @@ public class DatabaseHandler {
                     long mins = time / 60 ;
 
                     if (!(stat<10)) {
-                        sender.sendMessage(stat + ": " + ChatColor.GOLD + name + " " + ChatColor.AQUA + days + config.getDaysValue() + hours + config.getHoursValue() + mins + config.getMinutesValue());
+                        sender.sendMessage(stat + ": " + ChatColor.GOLD + name + " " + ChatColor.AQUA + days + " " + config.getDaysValue() + " " + hours + " " + config.getHoursValue() + " " + mins + config.getMinutesValue());
                     } else {
-                        sender.sendMessage("  "+stat + ": " + ChatColor.GOLD + name + " " + ChatColor.AQUA + days + config.getDaysValue() + hours + config.getHoursValue() + mins + config.getMinutesValue());
+                        sender.sendMessage("  " + stat + ": " + ChatColor.GOLD + name + " " + ChatColor.AQUA + days + " " + config.getDaysValue() + " " + hours + " " + config.getHoursValue() + " " + mins + " " + config.getMinutesValue());
                     }
 
                     count++;

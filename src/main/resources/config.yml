@@ -19,20 +19,22 @@ topListMax: 10
 #Plugin Prefix
 PluginPrefix: "§f[§cOnTime§f] "
 
-PlayerName: "§6Name:§r§l "
-PlayTime: "§6Playtime:§r§l "
-PlayerJoinDate: "§6Joined at:§r§l "
+PlayerName: "§6Name:§r§l"
+PlayTime: "§6Playtime:§r§l"
+PlayerJoinDate: "§6Joined at:§r§l"
 
-DaysValue: " Days "
-HoursValue: " Hours "
-MinutesValue: " Minutes "
-PlayerValue: " Spieler"
+DaysValue: "Tage"
+HoursValue: "Stunden"
+MinutesValue: "Minuten"
+PlayerValue: "Spieler"
 
 #Error Messages:
-NotAnIntegerError: "§4Please enter a valid number above 0."
-PlayerNotFoundError: "§4The specified player could not be found."
-CommandIsMissingArgsError: "§4Arguments are missing for this command."
-AmountHigherThanPlayTimeError: "§4The number indicated cannot be higher than the playing time. A player cannot have negative playing time."
+NotAnIntegerError: "§4Bitte gebe eine Zahl ein die größer als 0 ist."
+PlayerNotFoundError: "§4Der angegebene Spieler konnte nicht gefunden werden."
+CommandIsMissingArgsError: "§4Dieser Befehl ist nicht vollständig."
+AmountHigherThanPlayTimeError: "§4Die angegebene Zeit ist größer als die Spielzeit von diesem Spieler. Ein Spieler kann keine Negative Spiezeit besitzen."
+OntimeAddUsage: "Usage: /ontime add [Player] [Zeit in Sekunden]"
+OntimeRemoveUsage: "Usage: /ontime Remove [Player] [Zeit in Sekunden]"
 
 # MySQL
 mysql:

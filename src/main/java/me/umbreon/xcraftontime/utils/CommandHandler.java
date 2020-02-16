@@ -1,6 +1,6 @@
-package me.umbreon.ontimetracker.utils;
+package me.umbreon.xcraftontime.utils;
 
-import me.umbreon.ontimetracker.OntimeTracker;
+import me.umbreon.xcraftontime.Ontime;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -14,18 +14,18 @@ import java.util.List;
 
 public class CommandHandler implements CommandExecutor, TabCompleter {
 
-    private OntimeTracker main;
+    private Ontime main;
 
-    public CommandHandler(OntimeTracker ontimeTracker) {
-        main = ontimeTracker;
+    public CommandHandler(Ontime ontime) {
+        main = ontime;
     }
 
     @Deprecated
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
         if (args.length > 0) {
-            //Command for /ontime add
             if (args[0].equalsIgnoreCase("add") && sender.hasPermission("xcraftontime.add")) {
+
                 int amount = 0;
                 if (args.length > 1){
                     OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
@@ -33,18 +33,18 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
                         try {
                             amount = Integer.parseInt(args[2]);
                         } catch (NumberFormatException e) {
-                            sender.sendMessage(main.configHandler.getPluginPrefix() +""+ main.configHandler.getNotAnIntegerError());
+                            sender.sendMessage(main.configHandler.getPluginPrefix() + main.configHandler.getNotAnIntegerError());
                         }
                         if (amount <= 0) {
-                            sender.sendMessage(main.configHandler.getPluginPrefix() +""+ main.configHandler.getNotAnIntegerError());
+                            sender.sendMessage(main.configHandler.getPluginPrefix() + main.configHandler.getNotAnIntegerError());
                         } else {
                             main.databaseHandler.AddTime((Player) sender, target, amount);
                         }
                     } else {
-                        sender.sendMessage(main.configHandler.getPluginPrefix() + main.configHandler.getCommandIsMissingArgsError() + "\nUsage: /ontime add [Player] [Time in minutes]");
+                        sender.sendMessage(main.configHandler.getPluginPrefix() + main.configHandler.getCommandIsMissingArgsError() + "\n" + main.configHandler.ontimeAddUsage());
                     }
                 } else {
-                    sender.sendMessage(main.configHandler.getPluginPrefix() +""+ main.configHandler.getCommandIsMissingArgsError() + "\nUsage: /ontime add [Player] [Time in minutes]");
+                    sender.sendMessage(main.configHandler.getPluginPrefix() + main.configHandler.getCommandIsMissingArgsError() + "\n" + main.configHandler.ontimeAddUsage());
                 }
 
             //Command for /ontime remove
@@ -64,18 +64,16 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
                             main.databaseHandler.RemoveTime((Player) sender, target, amount);
                         }
                     } else {
-                        sender.sendMessage(main.configHandler.getPluginPrefix() + main.configHandler.getNotAnIntegerError());
+                        sender.sendMessage(main.configHandler.getPluginPrefix() + main.configHandler.getCommandIsMissingArgsError() + "\n" + main.configHandler.ontimeRemoveUsage());
                     }
                 } else {
-                    sender.sendMessage(main.configHandler.getPluginPrefix() + main.configHandler.getPlayerNotFoundError());
+                    sender.sendMessage(main.configHandler.getPluginPrefix() + main.configHandler.getCommandIsMissingArgsError() + "\n" + main.configHandler.ontimeRemoveUsage());
                 }
-
-            //Command for /ontime top
             } else if (args[0].equalsIgnoreCase("top") && sender.hasPermission("xcraftontime.top")){
                 main.databaseHandler.topTen((Player) sender);
             } else {
-                //Command for /ontime [PlayerName]
                 if (sender.hasPermission("xcraftontime.check.others")){
+                    Bukkit.getLogger().info("a");
                     OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
                     if (target.hasPlayedBefore()) {
                         main.databaseHandler.checkTarget((Player) sender, target);
@@ -85,8 +83,8 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
                 }
             }
         } else {
-            //Command for /ontime
             if (sender.hasPermission("xcraftontime.check")) {
+                Bukkit.getLogger().info("b");
                 main.databaseHandler.checkPlayer((Player) sender);
             }
         }

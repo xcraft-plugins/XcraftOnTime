@@ -1,4 +1,4 @@
-package me.umbreon.ontimetracker.utils;
+package me.umbreon.xcraftontime.utils;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,10 +13,6 @@ public class ConfigHandler {
         this.plugin = plugin;
         plugin.saveDefaultConfig();
         this.config = plugin.getConfig();
-    }
-
-    public FileConfiguration getConfig() {
-        return config;
     }
 
     public long getSleepTimer() {
@@ -67,14 +63,6 @@ public class ConfigHandler {
         return config.getString("AmountHigherThanPlayTimeError");
     }
 
-    String getDatabaseName() {
-        return config.getString("DatabaseName");
-    }
-
-    String getTableName(){
-        return config.getString("TableName");
-    }
-
     int getTopListMax(){
         return config.getInt("topListMax");
     }
@@ -87,20 +75,39 @@ public class ConfigHandler {
         return config.getBoolean("debug");
     }
 
-    String host(){
+    public String host(){
         return config.getString("mysql.host");
     }
-    String database(){
+
+    public String database(){
         return config.getString("mysql.database");
     }
-    String password(){
+
+    public String password(){
         return config.getString("mysql.password");
     }
-    String port(){
+
+    public String port(){
         return config.getString("mysql.port");
     }
-    String user(){
+
+    public String user(){
         return config.getString("mysql.user");
     }
 
+    public String ontimeRemoveUsage(){
+        return config.getString("OntimeRemoveUsage");
+    }
+
+    public String ontimeAddUsage(){
+        return config.getString("OntimeAddUsage");
+    }
+
+    public String olddatabase(){
+        return config.getString("oldmysql.database");
+    }
+
+    public String oldtable(){
+        return config.getString("oldmysql.table");
+    }
 }

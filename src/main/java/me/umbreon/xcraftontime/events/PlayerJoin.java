@@ -1,7 +1,7 @@
-package me.umbreon.ontimetracker.events;
+package me.umbreon.xcraftontime.events;
 
-import me.umbreon.ontimetracker.OntimeTracker;
-import me.umbreon.ontimetracker.utils.ConfigHandler;
+import me.umbreon.xcraftontime.Ontime;
+import me.umbreon.xcraftontime.utils.ConfigHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,11 +10,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 public class PlayerJoin implements Listener {
 
-    private OntimeTracker main;
+    private Ontime main;
     private ConfigHandler config;
 
-    public PlayerJoin(OntimeTracker ontimeTracker, ConfigHandler configHandler) {
-        main = ontimeTracker;
+    public PlayerJoin(Ontime ontime, ConfigHandler configHandler) {
+        main = ontime;
         this.config = configHandler;
     }
 
@@ -28,13 +28,13 @@ public class PlayerJoin implements Listener {
 
                 @Override
                 public void run() {
-                    main.databaseHandler.PlayerJoined(player);
+                    main.databaseHandler.MySqlJoinEvent(player);
                 }
 
             }, (SleepTimer % 3600) / 60);
 
         } else {
-            main.databaseHandler.PlayerJoined(player);
+            main.databaseHandler.MySqlJoinEvent(player);
         }
     }
 }

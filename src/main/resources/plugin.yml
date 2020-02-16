@@ -1,8 +1,7 @@
-name: OntimeTracker
+name: XcraftOntime
 version: 1.0.0
-main: me.umbreon.ontimetracker.OntimeTracker
+main: me.umbreon.xcraftontime.Ontime
 api-version: 1.14
-Version: 1.0.0
 depend:
   - Essentials
 authors:
@@ -11,7 +10,6 @@ authors:
 commands:
   ontime:
     description: Default Page
-    aliases: ontimetracker
 
 permissons:
   xcraftontime.add:
@@ -33,5 +31,13 @@ permissons:
     description: Allows the user to view his playing time and the playing time of others.
     default: false
     children:
+      xcraftontime.check: true
+      xcraftontime.check.others: true
+  xcraftontime.*:
+    default: op
+    children:
+      xcraftontime.add: true
+      xcraftontime.remove: true
+      xcraftontime.top: true
       xcraftontime.check: true
       xcraftontime.check.others: true

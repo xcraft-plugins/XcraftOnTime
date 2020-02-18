@@ -20,47 +20,47 @@ public class ConfigHandler {
     }
 
     String getPluginPrefix() {
-        return config.getString("PluginPrefix");
+        return config.getString("PLUGINPREFIX");
     }
 
     String getPlayerName() {
-        return config.getString("PlayerName");
+        return config.getString("PLAYERNAME");
     }
 
     String getPlayTime() {
-        return config.getString("PlayTime");
+        return config.getString("PLAYTIME");
     }
 
     String getJoinDate() {
-        return config.getString("PlayerJoinDate");
+        return config.getString("JOINDATE");
     }
 
     String getDaysValue(){
-        return config.getString("DaysValue");
+        return config.getString("DAYS");
     }
 
     String getHoursValue(){
-        return config.getString("HoursValue");
+        return config.getString("HOURS");
     }
 
     String getMinutesValue(){
-        return config.getString("MinutesValue");
+        return config.getString("MINUTES");
     }
 
     String getNotAnIntegerError() {
-        return config.getString("NotAnIntegerError");
+        return config.getString("NOTANNUMBER");
     }
 
     String getPlayerNotFoundError() {
-        return config.getString("PlayerNotFoundError");
+        return config.getString("PLAYERNOTFOUND");
     }
 
     String getCommandIsMissingArgsError() {
-        return config.getString("CommandIsMissingArgsError");
+        return config.getString("COMMANDISMISSINGARGS");
     }
 
     String getAmountHigherThanPlayTimeError() {
-        return config.getString("AmountHigherThanPlayTimeError");
+        return config.getString("AMOUNTHIGHERTHANPLAYTIME");
     }
 
     int getTopListMax(){
@@ -68,11 +68,7 @@ public class ConfigHandler {
     }
 
     String getPlayerValues(){
-        return config.getString("PlayerValue");
-    }
-
-    boolean getDebugValue() {
-        return config.getBoolean("debug");
+        return config.getString("PLAYER");
     }
 
     public String host(){
@@ -96,11 +92,11 @@ public class ConfigHandler {
     }
 
     public String ontimeRemoveUsage(){
-        return config.getString("OntimeRemoveUsage");
+        return config.getString("REMOVETIME");
     }
 
     public String ontimeAddUsage(){
-        return config.getString("OntimeAddUsage");
+        return config.getString("ADDTIME");
     }
 
     public String olddatabase(){
@@ -109,5 +105,9 @@ public class ConfigHandler {
 
     public String oldtable(){
         return config.getString("oldmysql.table");
+    }
+
+    public boolean convert(){
+        return config.getBoolean("convert");
     }
 }

@@ -24,6 +24,7 @@ public class Ontime extends JavaPlugin {
         databaseHandler.startup();
         databaseHandler.startTimedSaving();
         converter.convert();
+        saveDefaultConfig();
 
         Bukkit.getServer().getPluginManager().registerEvents(new PlayerJoin(this, configHandler), this);
         Bukkit.getServer().getPluginManager().registerEvents(new PlayerQuit(this), this);

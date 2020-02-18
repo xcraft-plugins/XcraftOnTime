@@ -1,3 +1,10 @@
+# Set this to true to convert every entry from "Ontime" to "XcraftOntime"
+convert: false
+
+oldmysql:
+  database:
+  table:
+
 # If Debug is set to "true" every event will get logged
 debug: true
 
@@ -13,33 +20,29 @@ autoSavePeriod: 5
 #SleepTimer is the time how long a new player has to be on the server to create a new file for him (0 = off, in minutes)
 SleepTimer: 10
 
-# maximum length of 'top player' lists
+# Maximum length of 'top player' lists
 topListMax: 10
-
-#Plugin Prefix
-PluginPrefix: "§f[§cOnTime§f] "
-
-PlayerName: "§6Name:§r§l"
-PlayTime: "§6Playtime:§r§l"
-PlayerJoinDate: "§6Joined at:§r§l"
-
-DaysValue: "Tage"
-HoursValue: "Stunden"
-MinutesValue: "Minuten"
-PlayerValue: "Spieler"
-
-#Error Messages:
-NotAnIntegerError: "§4Bitte gebe eine Zahl ein die größer als 0 ist."
-PlayerNotFoundError: "§4Der angegebene Spieler konnte nicht gefunden werden."
-CommandIsMissingArgsError: "§4Dieser Befehl ist nicht vollständig."
-AmountHigherThanPlayTimeError: "§4Die angegebene Zeit ist größer als die Spielzeit von diesem Spieler. Ein Spieler kann keine Negative Spiezeit besitzen."
-OntimeAddUsage: "Usage: /ontime add [Player] [Zeit in Sekunden]"
-OntimeRemoveUsage: "Usage: /ontime Remove [Player] [Zeit in Sekunden]"
 
 # MySQL
 mysql:
-  host: localhost
+  host: 127.0.0.1
   port: 3306
-  user: root
+  user:
   password:
   database:
+
+# Messages & Strings
+PLUGINPREFIX: "§f[§cOnTime§f]"
+PLAYERNAME: "§6Name:§r§l"
+PLAYTIME: "§6Playtime:§r§l"
+JOINDATE: "§6Joined at:§r§l"
+DAYS: "Tage"
+HOURS: "Stunden"
+MINUTES: "Minuten"
+PLAYER: "Spieler"
+NOTANNUMBER: "§4Bitte gebe eine Zahl ein die größer als 0 ist."
+PLAYERNOTFOUND: "§4Der angegebene Spieler konnte nicht gefunden werden."
+COMMANDISMISSINGARGS: "§4Dieser Befehl ist nicht vollständig."
+AMOUNTHIGHERTHANPLAYTIME: "§4Die angegebene Zeit ist größer als die Spielzeit von diesem Spieler. Ein Spieler kann keine Negative Spiezeit besitzen."
+ADDTIME: "Usage: /ontime add [Player] [Zeit in Sekunden]"
+REMOVETIME: "Usage: /ontime Remove [Player] [Zeit in Sekunden]"

@@ -2,6 +2,7 @@ package me.umbreon.xcraftontime.utils;
 
 import me.umbreon.xcraftontime.Ontime;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -46,8 +47,6 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
                 } else {
                     sender.sendMessage(main.configHandler.getPluginPrefix() + main.configHandler.getCommandIsMissingArgsError() + "\n" + main.configHandler.ontimeAddUsage());
                 }
-
-            //Command for /ontime remove
             } else if (args[0].equalsIgnoreCase("remove") && sender.hasPermission("xcraftontime.remove")) {
                 int amount = 0;
                 if (args.length > 1) {
@@ -69,22 +68,40 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
                 } else {
                     sender.sendMessage(main.configHandler.getPluginPrefix() + main.configHandler.getCommandIsMissingArgsError() + "\n" + main.configHandler.ontimeRemoveUsage());
                 }
-            } else if (args[0].equalsIgnoreCase("top") && sender.hasPermission("xcraftontime.top")){
+            } else if (args[0].equalsIgnoreCase("top") && sender.hasPermission("xcraftontime.top")) {
                 main.databaseHandler.topTen((Player) sender);
+            }else if(args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("info") && sender.hasPermission("xcraftontime.help")){
+                sender.sendMessage(main.configHandler.getPluginPrefix() + " ArdaniaOntimeTracker Hilfeseite:");
+                if (sender.hasPermission("xcraftontime.check")){
+                    sender.sendMessage("/ontime - Zeit dir die Onlinezeit von dir an.");
+                }
+                if (sender.hasPermission("xcraftontime.check.others")){
+                    sender.sendMessage("/ontime [Spieler] - Zeit dir die Onlinezeit von dem Spieler an.");
+                }
+                if (sender.hasPermission("xcraftontime.top")){
+                    sender.sendMessage("/ontime [top] - Zeit dir die Onlinezeit von den 10 besten Spielern an.");
+                }
+                if (sender.hasPermission("xcraftontime.add")){
+                    sender.sendMessage("/ontime add [Spieler] [Zeit in Sekunden] - Fügt die angegebene Zeit dem Spieler hinzu.");
+                }
+                if (sender.hasPermission("xcraftontime.remove")){
+                    sender.sendMessage("/ontime remove [Spieler] [Zeit in Sekunden] - Entfernt die angegebene Zeit dem Spieler.");
+                }
+                if (sender.hasPermission("xcraftontime.removeplayer")){
+                    sender.sendMessage("/ontime player remove [Spieler] - Entfernt die gespeicherten Daten von dem Angebenen Spieler. " + ChatColor.DARK_RED + "Achtung: Das kann nicht wieder rückgängig gemacht werden!");
+                }
             } else {
                 if (sender.hasPermission("xcraftontime.check.others")){
-                    Bukkit.getLogger().info("a");
                     OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
                     if (target.hasPlayedBefore()) {
                         main.databaseHandler.checkTarget((Player) sender, target);
                     } else {
-                        sender.sendMessage(main.configHandler.getPluginPrefix() + main.configHandler.getPlayerNotFoundError());
+                        sender.sendMessage(main.configHandler.getPluginPrefix() +  " " + main.configHandler.getPlayerNotFoundError());
                     }
                 }
             }
         } else {
             if (sender.hasPermission("xcraftontime.check")) {
-                Bukkit.getLogger().info("b");
                 main.databaseHandler.checkPlayer((Player) sender);
             }
         }

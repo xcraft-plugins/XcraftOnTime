@@ -10,18 +10,23 @@ import org.bukkit.event.Listener;
 public class AfkStatusChange implements Listener {
 
     private Ontime main;
+    private PlayerQuit PlayerQuit;
+    private PlayerJoin PlayerJoin;
     private static Essentials essentials = (Essentials) Bukkit.getServer().getPluginManager().getPlugin("Essentials");
 
     public AfkStatusChange(Ontime ontime) {
         main = ontime;
+        PlayerQuit = new PlayerQuit(ontime, ontime.getDatabaseHandler());
+        PlayerJoin = new PlayerJoin(ontime, main.getConfigHandler(), ontime.getDatabaseHandler());
     }
 
     @EventHandler
     public void onAfkStatusChangeEvent(AfkStatusChangeEvent event){
         if (essentials.getUser(event.getAffected().getBase()).isAfk()){
-            main.databaseHandler.MySqlJoinEvent(event.getAffected().getBase());
+            PlayerJoin.joinEvent(event.getAffected().getBase());
+
         } else {
-            main.databaseHandler.MySqlQuitEvent(event.getAffected().getBase().getUniqueId());
+            PlayerQuit.quitEvent(event.getAffected().getBase().getUniqueId());
         }
     }
 }

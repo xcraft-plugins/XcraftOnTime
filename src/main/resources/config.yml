@@ -28,6 +28,7 @@ mysql:
   host: 127.0.0.1
   port: 3306
   user:
+  table:
   password:
   database:
 
@@ -40,9 +41,12 @@ DAYS: "Tage"
 HOURS: "Stunden"
 MINUTES: "Minuten"
 PLAYER: "Spieler"
-NOTANNUMBER: "§4Bitte gebe eine Zahl ein die größer als 0 ist."
-PLAYERNOTFOUND: "§4Der angegebene Spieler konnte nicht gefunden werden."
-COMMANDISMISSINGARGS: "§4Dieser Befehl ist nicht vollständig."
-AMOUNTHIGHERTHANPLAYTIME: "§4Die angegebene Zeit ist größer als die Spielzeit von diesem Spieler. Ein Spieler kann keine Negative Spiezeit besitzen."
 ADDTIME: "Usage: /ontime add [Player] [Zeit in Sekunden]"
 REMOVETIME: "Usage: /ontime Remove [Player] [Zeit in Sekunden]"
+
+# Errors:
+NotAnInteger: "§4Bitte gebe eine Zahl ein die größer als 0 ist."
+PlayerNotFound: "§4Der angegebene Spieler konnte nicht gefunden werden."
+CommandIsMissingArgs: "§4Dieser Befehl ist nicht vollständig."
+AmountHigherThanPlaytime: "§4Die angegebene Zeit ist größer als die Spielzeit von diesem Spieler. Ein Spieler kann keine Negative Spiezeit besitzen."
+NoConnectionToSQL: "§4Es konnte sich nicht zur Datenbank verbunden werden."

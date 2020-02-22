@@ -4,36 +4,75 @@ import me.umbreon.xcraftontime.converter.Converter;
 import me.umbreon.xcraftontime.events.AfkStatusChange;
 import me.umbreon.xcraftontime.events.PlayerJoin;
 import me.umbreon.xcraftontime.events.PlayerQuit;
-import me.umbreon.xcraftontime.utils.CommandHandler;
-import me.umbreon.xcraftontime.utils.ConfigHandler;
-import me.umbreon.xcraftontime.utils.DatabaseHandler;
+import me.umbreon.xcraftontime.handlers.CommandHandler;
+import me.umbreon.xcraftontime.handlers.ConfigHandler;
+import me.umbreon.xcraftontime.handlers.DatabaseHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * ToDo: Remove Player Command, Move Player Command, Produktbeschreibung
+ */
 public class Ontime extends JavaPlugin {
 
-    public DatabaseHandler databaseHandler;
-    public ConfigHandler configHandler;
-    public Converter converter;
+    private DatabaseHandler databaseHandler;
+    private ConfigHandler configHandler;
+    private Converter converter;
 
-    public void onEnable() { saveDefaultConfig();
-        configHandler = new ConfigHandler(this);
-        CommandHandler commandHandler = new CommandHandler(this);
-        databaseHandler = new DatabaseHandler(this, configHandler);
-        converter = new Converter(this, configHandler);
-        databaseHandler.startup();
-        databaseHandler.startTimedSaving();
-        converter.convert();
+    public void onEnable() {
         saveDefaultConfig();
 
-        Bukkit.getServer().getPluginManager().registerEvents(new PlayerJoin(this, configHandler), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new PlayerQuit(this), this);
+        setConfigHandler(new ConfigHandler(this));
+        setDatabaseHandler(new DatabaseHandler(this, getConfigHandler()));
+        setConverter(new Converter(this, getConfigHandler()));
+
+        initDatebase();
+
+        registerEvents();
+        setExecutors();
+    }
+
+    private void initDatebase() {
+        getDatabaseHandler().startup();
+        getDatabaseHandler().startTimedSaving();
+        getConverter().convert();
+    }
+
+    private void setExecutors() {
+        getCommand("ontime").setExecutor(new CommandHandler(this));
+    }
+
+    private void registerEvents() {
+        Bukkit.getServer().getPluginManager().registerEvents(new PlayerJoin(this, getConfigHandler(), getDatabaseHandler()), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new PlayerQuit(this, getDatabaseHandler()), this);
         Bukkit.getServer().getPluginManager().registerEvents(new AfkStatusChange(this), this);
-        getCommand("ontime").setExecutor(commandHandler);
     }
 
     public void onDisable() {
-        databaseHandler.Shutdown();
+        getDatabaseHandler().Shutdown();
     }
 
+    public DatabaseHandler getDatabaseHandler() {
+        return databaseHandler;
+    }
+
+    public void setDatabaseHandler(DatabaseHandler databaseHandler) {
+        this.databaseHandler = databaseHandler;
+    }
+
+    public ConfigHandler getConfigHandler() {
+        return configHandler;
+    }
+
+    public void setConfigHandler(ConfigHandler configHandler) {
+        this.configHandler = configHandler;
+    }
+
+    public Converter getConverter() {
+        return converter;
+    }
+
+    public void setConverter(Converter converter) {
+        this.converter = converter;
+    }
 }

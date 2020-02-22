@@ -1,7 +1,7 @@
 package me.umbreon.xcraftontime.converter;
 
 import me.umbreon.xcraftontime.Ontime;
-import me.umbreon.xcraftontime.utils.ConfigHandler;
+import me.umbreon.xcraftontime.handlers.ConfigHandler;
 import org.bukkit.Bukkit;
 
 import java.sql.*;
@@ -19,10 +19,10 @@ public class Converter {
     }
 
     private Connection connect() {
-        String host = config.host();
-        String port = config.port();
-        String user = config.user();
-        String password = config.password();
+        String host = config.getHostAdress();
+        String port = config.getPort();
+        String user = config.getUsername();
+        String password = config.getPassword();
 
         String database = config.olddatabase();
 

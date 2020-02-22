@@ -1,21 +1,29 @@
 package me.umbreon.xcraftontime.events;
 
 import me.umbreon.xcraftontime.Ontime;
-import me.umbreon.xcraftontime.utils.ConfigHandler;
+import me.umbreon.xcraftontime.handlers.ConfigHandler;
+import me.umbreon.xcraftontime.handlers.DatabaseHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Calendar;
+
 public class PlayerJoin implements Listener {
 
     private Ontime main;
     private ConfigHandler config;
+    private DatabaseHandler database;
 
-    public PlayerJoin(Ontime ontime, ConfigHandler configHandler) {
+    public PlayerJoin(Ontime ontime, ConfigHandler configHandler, DatabaseHandler databaseHandler) {
         main = ontime;
         this.config = configHandler;
+        database = databaseHandler;
     }
 
     @EventHandler
@@ -28,13 +36,34 @@ public class PlayerJoin implements Listener {
 
                 @Override
                 public void run() {
-                    main.databaseHandler.MySqlJoinEvent(player);
+                    joinEvent(player);
                 }
 
             }, (SleepTimer % 3600) / 60);
 
         } else {
-            main.databaseHandler.MySqlJoinEvent(player);
+            joinEvent(player);
+        }
+    }
+
+    public void joinEvent(Player player){
+        try {
+            String select = "SELECT uuid FROM " + config.getTable() + " WHERE uuid = ?";
+            if (database.checkConnection()){
+                PreparedStatement statement = null;
+                Bukkit.getLogger().info(database.connection.getSchema());
+                statement = database.connection.prepareStatement(select);
+                statement.setString(1, player.getUniqueId().toString());
+                ResultSet rs = statement.executeQuery();
+                if (!rs.next()){
+                    database.createNewEntry(player);
+                    database.cache.put(player.getUniqueId(), Calendar.getInstance().getTime());
+                } else {
+                    database.cache.put(player.getUniqueId(), Calendar.getInstance().getTime());
+                }
+            }
+        } catch (SQLException e) {
+            Bukkit.getLogger().info(e.toString());
         }
     }
 }

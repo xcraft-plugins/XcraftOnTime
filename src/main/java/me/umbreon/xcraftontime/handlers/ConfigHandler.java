@@ -61,11 +61,11 @@ public class ConfigHandler {
 
 
 
-    public String ontimeRemoveUsage(){
+    public String RemoveTimeUsage(){
         return config.getString("REMOVETIME");
     }
 
-    public String ontimeAddUsage(){
+    public String AddTimeUsage(){
         return config.getString("ADDTIME");
     }
 
@@ -129,5 +129,9 @@ public class ConfigHandler {
 
     public String NoConnectionToSQLError(){
         return config.getString("NoConnectionToSQL");
+    }
+
+    public String NoPermissionError(){
+        return config.getString("NoPermission");
     }
 }

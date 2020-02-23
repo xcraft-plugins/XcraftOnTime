@@ -1,6 +1,6 @@
 package me.umbreon.xcraftontime.converter;
 
-import me.umbreon.xcraftontime.Ontime;
+import me.umbreon.xcraftontime.OnlineTimeTracker;
 import me.umbreon.xcraftontime.handlers.ConfigHandler;
 import org.bukkit.Bukkit;
 
@@ -8,12 +8,12 @@ import java.sql.*;
 
 public class Converter {
 
-    private Ontime main;
+    private OnlineTimeTracker main;
     private ConfigHandler config;
 
     private Connection connection;
 
-    public Converter(Ontime ontime, ConfigHandler configHandler) {
+    public Converter(OnlineTimeTracker ontime, ConfigHandler configHandler) {
         this.main = ontime;
         this.config = configHandler;
     }

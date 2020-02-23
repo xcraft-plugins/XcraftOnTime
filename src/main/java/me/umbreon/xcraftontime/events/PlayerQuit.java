@@ -1,6 +1,6 @@
 package me.umbreon.xcraftontime.events;
 
-import me.umbreon.xcraftontime.Ontime;
+import me.umbreon.xcraftontime.OnlineTimeTracker;
 import me.umbreon.xcraftontime.handlers.ConfigHandler;
 import me.umbreon.xcraftontime.handlers.DatabaseHandler;
 import org.bukkit.Bukkit;
@@ -15,13 +15,13 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class PlayerQuit implements Listener {
-    private Ontime main;
+    private OnlineTimeTracker onlineTimeTracker;
     private ConfigHandler config;
     private DatabaseHandler database;
 
-    public PlayerQuit(Ontime ontime, DatabaseHandler databaseHandler) {
-        this.main = ontime;
-        config = main.getConfigHandler();
+    public PlayerQuit(OnlineTimeTracker onlineTimeTracker, DatabaseHandler databaseHandler) {
+        this.onlineTimeTracker = onlineTimeTracker;
+        config = this.onlineTimeTracker.getConfigHandler();
         database = databaseHandler;
     }
 

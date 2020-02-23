@@ -1,7 +1,7 @@
 package me.umbreon.xcraftontime.events;
 
 import com.earth2me.essentials.Essentials;
-import me.umbreon.xcraftontime.Ontime;
+import me.umbreon.xcraftontime.OnlineTimeTracker;
 import net.ess3.api.events.AfkStatusChangeEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -9,15 +9,15 @@ import org.bukkit.event.Listener;
 
 public class AfkStatusChange implements Listener {
 
-    private Ontime main;
+    private OnlineTimeTracker onlineTimeTracker;
     private PlayerQuit PlayerQuit;
     private PlayerJoin PlayerJoin;
     private static Essentials essentials = (Essentials) Bukkit.getServer().getPluginManager().getPlugin("Essentials");
 
-    public AfkStatusChange(Ontime ontime) {
-        main = ontime;
-        PlayerQuit = new PlayerQuit(ontime, ontime.getDatabaseHandler());
-        PlayerJoin = new PlayerJoin(ontime, main.getConfigHandler(), ontime.getDatabaseHandler());
+    public AfkStatusChange(OnlineTimeTracker onlineTimeTracker) {
+        this.onlineTimeTracker = onlineTimeTracker;
+        PlayerQuit = new PlayerQuit(onlineTimeTracker, onlineTimeTracker.getDatabaseHandler());
+        PlayerJoin = new PlayerJoin(onlineTimeTracker, this.onlineTimeTracker.getConfigHandler(), onlineTimeTracker.getDatabaseHandler());
     }
 
     @EventHandler

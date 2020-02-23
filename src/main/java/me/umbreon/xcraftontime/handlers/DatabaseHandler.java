@@ -1,6 +1,6 @@
 package me.umbreon.xcraftontime.handlers;
 
-import me.umbreon.xcraftontime.Ontime;
+import me.umbreon.xcraftontime.OnlineTimeTracker;
 import me.umbreon.xcraftontime.events.PlayerJoin;
 import me.umbreon.xcraftontime.events.PlayerQuit;
 import org.bukkit.Bukkit;
@@ -14,18 +14,18 @@ import java.util.UUID;
 
 public class DatabaseHandler {
 
-    private Ontime main;
+    private OnlineTimeTracker main;
     private ConfigHandler config;
     public Map<UUID, Date> cache = new HashMap<>();
     public Connection connection;
     private PlayerQuit PlayerQuit;
     private PlayerJoin PlayerJoin;
 
-    public DatabaseHandler(Ontime ontime, ConfigHandler configHandler) {
-        this.main = ontime;
+    public DatabaseHandler(OnlineTimeTracker onlineTimeTracker, ConfigHandler configHandler) {
+        this.main = onlineTimeTracker;
         this.config = configHandler;
-        PlayerQuit = new PlayerQuit(ontime, this);
-        PlayerJoin = new PlayerJoin(ontime, configHandler, this);
+        PlayerQuit = new PlayerQuit(onlineTimeTracker, this);
+        PlayerJoin = new PlayerJoin(onlineTimeTracker, configHandler, this);
     }
 
     public Connection startup() {
@@ -67,7 +67,7 @@ public class DatabaseHandler {
         return true;
     }
 
-    public void createNewEntry(Player player){
+    public void createNewEntry(Player player, int amount){
         String entry = "INSERT INTO " + config.getTable() + "(uuid, playtime) VALUES (?,?)";
 
         try {
@@ -75,7 +75,7 @@ public class DatabaseHandler {
                 PreparedStatement statement = null;
                 statement = connection.prepareStatement(entry);
                 statement.setString(1, String.valueOf(player.getUniqueId()));
-                statement.setInt(2, 0);
+                statement.setInt(2, amount);
                 statement.executeUpdate();
                 if (config.isPluginDebugging()){
                     Bukkit.getLogger().info("[" + config.getTable() + "]" + " Created new entry for player " + player.getName());

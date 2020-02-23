@@ -11,9 +11,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
- * ToDo: Remove Player Command, Move Player Command, Produktbeschreibung
+ * ToDo: produktbeschreibung
  */
-public class Ontime extends JavaPlugin {
+public class OnlineTimeTracker extends JavaPlugin {
 
     private DatabaseHandler databaseHandler;
     private ConfigHandler configHandler;

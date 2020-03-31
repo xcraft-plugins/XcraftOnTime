@@ -1,43 +1,46 @@
+main: me.umbreon.xcraftontime.OnlineTimeTracker
 name: XcraftOntime
 version: 1.0.0
-main: me.umbreon.xcraftontime.Ontime
-api-version: 1.14
+description: Saves the player's playing time on the server to a database.
+api-version: 1.15
 depend:
   - Essentials
 authors:
   - Umbreon
+prefix: OntimeTracker
 
 commands:
   ontime:
-    description: Default Page
+    description: The default command that executes all actions via the CommandHandler.
+    aliases: [ontimetracker]
 
 permissons:
   xcraftontime.add:
-    description: Permission to add playtime.
     default: op
+
   xcraftontime.remove:
-    description: Permission to remove playtime.
     default: op
+
   xcraftontime.top:
-    description: Allows you to view the top 10 with the most playing time.
     default: op
+
   xcraftontime.check:
-    description: Allows the user to view his playing time.
-    default: true
+    default: op
+
   xcraftontime.check.others:
-    description: Allows the user to view the playing time of others.
     default: op
-  xcraftontime.check.*:
-    description: Allows the user to view his playing time and the playing time of others.
-    default: false
-    children:
-      xcraftontime.check: true
-      xcraftontime.check.others: true
-  xcraftontime.*:
+
+  xcraftontime.date:
     default: op
-    children:
-      xcraftontime.add: true
-      xcraftontime.remove: true
-      xcraftontime.top: true
-      xcraftontime.check: true
-      xcraftontime.check.others: true
+
+  xcraftontime.date.others:
+    default: op
+
+  xcraftontime.clear:
+    default: op
+
+  xcraftontime.reload:
+    default: op
+
+  xcraftontime.help:
+    default: op

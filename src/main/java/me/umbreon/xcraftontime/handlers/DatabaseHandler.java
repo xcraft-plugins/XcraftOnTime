@@ -1,39 +1,40 @@
 package me.umbreon.xcraftontime.handlers;
 
-import me.umbreon.xcraftontime.OnlineTimeTracker;
-import me.umbreon.xcraftontime.events.PlayerJoin;
-import me.umbreon.xcraftontime.events.PlayerQuit;
+import me.umbreon.xcraftontime.data.PlayertimeRecord;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.sql.*;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
 import java.util.UUID;
 
 public class DatabaseHandler {
 
-    private OnlineTimeTracker main;
-    private ConfigHandler config;
-    public Map<UUID, Date> cache = new HashMap<>();
-    public Connection connection;
-    private PlayerQuit PlayerQuit;
-    private PlayerJoin PlayerJoin;
+    private ConfigHandler configHandler;
+    public static Connection connection;
 
-    public DatabaseHandler(OnlineTimeTracker onlineTimeTracker, ConfigHandler configHandler) {
-        this.main = onlineTimeTracker;
-        this.config = configHandler;
-        PlayerQuit = new PlayerQuit(onlineTimeTracker, this);
-        PlayerJoin = new PlayerJoin(onlineTimeTracker, configHandler, this);
+    private PreparedStatement getPlayernameByUuidStatement;
+    private PreparedStatement updatePlayerOnlineTimeStatement;
+    private PreparedStatement setNewPlayernameStatement;
+    private PreparedStatement deletePlayerStatement;
+    private PreparedStatement showTopListStatement;
+    private PreparedStatement createNewEntryStatement;
+    private PreparedStatement getPlaytimeStatement;
+    private PreparedStatement addPlayerOnlineTimeStatement;
+    private PreparedStatement statement;
+
+    public DatabaseHandler(ConfigHandler configHandler) {
+        this.configHandler = configHandler;
     }
 
     public Connection startup() {
-        String host = config.getHostAdress();
-        String port = config.getPort();
-        String database = config.getDatabaseName();
-        String user = config.getUsername();
-        String password = config.getPassword();
+        String host = configHandler.getHostAdress();
+        String port = configHandler.getPort();
+        String database = configHandler.getDatabaseName();
+        String user = configHandler.getUsername();
+        String password = configHandler.getPassword();
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -41,11 +42,23 @@ public class DatabaseHandler {
             String url = "jdbc:mysql://" + host + ":" + port + "/" + database;
             Connection connection = DriverManager.getConnection(url, user, password);
 
-            connection.createStatement().execute("CREATE TABLE IF NOT EXISTS " + config.getTable() + " (\n"
+            connection.createStatement().execute("CREATE TABLE IF NOT EXISTS " + configHandler.getTable() + " (\n"
                     + "uuid VARCHAR(50) PRIMARY KEY,\n"
-                    + "playtime INT(255) NOT NULL\n"
+                    + "playtime INT(255) NOT NULL,\n"
+                    + "name VARCHAR(50) NOT NULL\n"
                     + ")"
             );
+
+            getPlayernameByUuidStatement = connection.prepareStatement("SELECT name FROM `" + configHandler.getTable() + "` WHERE uuid = ?");
+            showTopListStatement = connection.prepareStatement("SELECT playtime, uuid, name FROM " + configHandler.getTable() + " ORDER BY playtime DESC LIMIT ?");
+            getPlaytimeStatement = connection.prepareStatement("SELECT playtime FROM `" + configHandler.getTable() + "` WHERE uuid = ?");
+            updatePlayerOnlineTimeStatement = connection.prepareStatement("UPDATE " + configHandler.getTable() + " SET playtime = ? WHERE uuid = ?");
+            addPlayerOnlineTimeStatement = connection.prepareStatement("UPDATE " + configHandler.getTable() + " SET playtime = playtime + ? WHERE uuid = ?");
+            setNewPlayernameStatement = connection.prepareStatement("UPDATE " + configHandler.getTable() + " SET name = ? WHERE uuid = ?");
+            deletePlayerStatement = connection.prepareStatement("DELETE FROM " + configHandler.getTable() + " WHERE uuid = ?");
+            createNewEntryStatement = connection.prepareStatement("INSERT INTO " + configHandler.getTable() + "(uuid, playtime, name) VALUES (?,?,?)");
+            statement = connection.prepareStatement("SELECT * FROM " + configHandler.getTable() + " WHERE uuid = ?");
+
 
             return connection;
         } catch (ClassNotFoundException | SQLException e) {
@@ -54,83 +67,162 @@ public class DatabaseHandler {
         }
     }
 
-    public boolean checkConnection() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            connection = startup();
-
+    private boolean checkConnection() {
+        try {
             if (connection == null || connection.isClosed()) {
-                Bukkit.getLogger().info("[XCraftOntime] Couldn't connect to database! !");
-                return false;
-            }
+                connection = startup();
 
+                if (connection == null || connection.isClosed()) {
+                    Bukkit.getLogger().info(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" + configHandler.NoConnectionToSQLError());
+                    return false;
+                }
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return true;
     }
 
-    public void createNewEntry(Player player, int amount){
-        String entry = "INSERT INTO " + config.getTable() + "(uuid, playtime) VALUES (?,?)";
-
+    private void createNewEntry(Player player) {
         try {
-            if (checkConnection()){
-                PreparedStatement statement = null;
-                statement = connection.prepareStatement(entry);
-                statement.setString(1, String.valueOf(player.getUniqueId()));
-                statement.setInt(2, amount);
-                statement.executeUpdate();
-                if (config.isPluginDebugging()){
-                    Bukkit.getLogger().info("[" + config.getTable() + "]" + " Created new entry for player " + player.getName());
-                }
+            if (checkConnection()) {
+                createNewEntryStatement.setString(1, String.valueOf(player.getUniqueId()));
+                createNewEntryStatement.setInt(2, 0);
+                createNewEntryStatement.setString(3, player.getName());
+                createNewEntryStatement.executeUpdate();
+                Bukkit.getLogger().info("[" + configHandler.getTable() + "]" + " Created new entry for player " + player.getName());
+
             }
         } catch (SQLException e) {
-            Bukkit.getLogger().info("[XCraftOntime] Couldn't connect to database!");
+            e.printStackTrace();
         }
     }
 
     public int getPlaytime(UUID uuid) {
         int playtime = 0;
-        String select = "SELECT playtime FROM " + config.getTable() + " WHERE UUID = ?";
-        PreparedStatement statement = null;
         try {
-            statement = connection.prepareStatement(select);
-            statement.setString(1, uuid.toString());
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()){
-                playtime = rs.getInt("playtime");
+            if (checkConnection()) {
+                getPlaytimeStatement.setString(1, uuid.toString());
+                try (ResultSet resultSet = getPlaytimeStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        playtime = resultSet.getInt("playtime");
+                    }
+                }
             }
         } catch (SQLException e) {
-            Bukkit.getLogger().info("[XCraftOntime] Couldn't connect to database!");
+            e.printStackTrace();
         }
         return playtime;
     }
 
-    public void Shutdown(){
-        for (UUID uuid:cache.keySet()) {
-            PlayerQuit.quitEvent(uuid);
+    public String getPlayerName(UUID uuid) {
+        String name = null;
+        try {
+            if (checkConnection()) {
+                getPlayernameByUuidStatement.setString(1, uuid.toString());
+                try (ResultSet resultSet = getPlayernameByUuidStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        name = resultSet.getString("name");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+        return name;
+    }
+
+    public void closeConnection() {
         if (connection != null) {
             try {
                 connection.close();
-                Bukkit.getLogger().info("[XCraftOntime] Closed database connection!");
+                Bukkit.getLogger().info(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" + configHandler.ConnectionToSQLClosedMessage());
             } catch (SQLException e) {
-                Bukkit.getLogger().info("[XCraftOntime] Couldn't connect to database!");
+                e.printStackTrace();
             }
         }
-        Bukkit.getLogger().info("[XcraftOntime] Saved all players.");
     }
 
-    public void startTimedSaving(){
-        int SleepTimer = (int) config.getSleepTimer();
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(main, new Runnable() {
-            @Override
-            public void run() {
-                for (Player player : Bukkit.getServer().getOnlinePlayers()){
-                    PlayerQuit.quitEvent(player.getUniqueId());
-                    PlayerJoin.joinEvent(player);
-                }
+    public boolean updatePlayerOnlineTime(UUID uuid, long newTime) {
+        if (checkConnection()) {
+            try {
+                updatePlayerOnlineTimeStatement.setLong(1, newTime);
+                updatePlayerOnlineTimeStatement.setString(2, uuid.toString());
+                updatePlayerOnlineTimeStatement.executeUpdate();
+                return true;
+            } catch (SQLException e) {
+                Bukkit.getLogger().info(e.toString());
             }
-        }, 0L, 20L * SleepTimer * 60);
-        if (config.isPluginDebugging()){
-            Bukkit.getLogger().info("[XcraftOntime] Saved all playtime");
+        }
+        return false;
+    }
+
+    void addPlayerOnlineTime(UUID uuid, long newTime) {
+        if (checkConnection()) {
+            try {
+                addPlayerOnlineTimeStatement.setLong(1, newTime);
+                addPlayerOnlineTimeStatement.setString(2, uuid.toString());
+                addPlayerOnlineTimeStatement.executeUpdate();
+            } catch (SQLException e) {
+                Bukkit.getLogger().info(e.toString());
+            }
         }
     }
+
+    public void initPlayer(Player player) {
+        String playername = getPlayerName(player.getUniqueId());
+        if (playername == null) {
+            createNewEntry(player);
+        } else {
+            checkIfPlayerHasNewName(player, playername);
+        }
+    }
+
+    private void checkIfPlayerHasNewName(Player player, String oldPlayername) {
+        if (checkConnection()) {
+            if (!oldPlayername.equals(player.getName())) {
+                try {
+                    setNewPlayernameStatement.setString(1, player.getName());
+                    setNewPlayernameStatement.setString(2, player.getUniqueId().toString());
+                    setNewPlayernameStatement.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void executeRemovePlayerCommand(OfflinePlayer offlinePlayer) {
+        if (checkConnection()) {
+            try {
+                deletePlayerStatement.setString(1, offlinePlayer.getUniqueId().toString());
+                deletePlayerStatement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public LinkedList<PlayertimeRecord> getTopPlayerTimes(int amount) {
+        LinkedList<PlayertimeRecord> listOfPlayertimeRecords = new LinkedList<>();
+
+        try {
+            showTopListStatement.setInt(1, amount);
+            try (ResultSet resultSet = showTopListStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    listOfPlayertimeRecords.add(new PlayertimeRecord(
+                            resultSet.getString("name"),
+                            resultSet.getLong("playtime"),
+                            UUID.fromString(resultSet.getString("uuid")))
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return listOfPlayertimeRecords;
+    }
+
 }

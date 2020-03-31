@@ -1,12 +1,5 @@
-# Set this to true to convert every entry from "Ontime" to "XcraftOntime"
-convert: false
-
-oldmysql:
-  database:
-  table:
-
 # If Debug is set to "true" every event will get logged
-debug: true
+debug: false
 
 # Enable if AFK status to be checked, and AFK time NOT counted
 afkPlayerCheck: true
@@ -16,9 +9,6 @@ autoSave: true
 
 # If auto save is enabled above, how frequently (in minutes) should this be done.
 autoSavePeriod: 5
-
-#SleepTimer is the time how long a new player has to be on the server to create a new file for him (0 = off, in minutes)
-SleepTimer: 10
 
 # Maximum length of 'top player' lists
 topListMax: 10
@@ -32,22 +22,55 @@ mysql:
   password:
   database:
 
-# Messages & Strings
-PLUGINPREFIX: "§f[§cOnTime§f]"
-PLAYERNAME: "§6Name:§r§l"
-PLAYTIME: "§6Playtime:§r§l"
-JOINDATE: "§6Joined at:§r§l"
-DAYS: "Tage"
-HOURS: "Stunden"
-MINUTES: "Minuten"
-PLAYER: "Spieler"
-ADDTIME: "Usage: /ontime add [Player] [Zeit in Sekunden]"
-REMOVETIME: "Usage: /ontime Remove [Player] [Zeit in Sekunden]"
+# Strings
+PluginPrefix: "OnTime"
+Name: "Name:"
+Playtime: "Playtime:"
+Joined: "Joined at:"
+Player: "Player"
+Days: "Days"
+Hours: "Hours"
+Minutes: "Minutes"
+Seconds: "seconds"
+Second: "second"
+Time: "Time"
+Statistic: "Playtime Statistics"
+HelpPage: "Help Page"
 
-# Errors:
-NotAnInteger: "§4Bitte gebe eine Zahl ein die größer als 0 ist."
-PlayerNotFound: "§4Der angegebene Spieler konnte nicht gefunden werden."
-CommandIsMissingArgs: "§4Dieser Befehl ist nicht vollständig."
-AmountHigherThanPlaytime: "§4Die angegebene Zeit ist größer als die Spielzeit von diesem Spieler. Ein Spieler kann keine Negative Spiezeit besitzen."
-NoConnectionToSQL: "§4Es konnte sich nicht zur Datenbank verbunden werden."
-NoPermission: "§4Du besitzt nicht die Berechtigung dies zu tun."
+# Informations:
+ConnectionToSQLClosed: "The connection to the database has been disconnected."
+ClearMessage: "The stored data from player %s has been successfully deleted."
+AddTimeMessage: "%d %s were added to the player %s."
+RemoveTimeMessage: "%d %s were taken from the player %s."
+ConsoleError: "Hey you! You can't execute that command from the console."
+
+# Error-Messages:
+NotAnIntegerError: "Please enter a number that is greater than 0."
+CommandIsMissingArgsError: "This command is not complete."
+PlayerNotFoundError: "The specified player could not be found."
+ExecuteError: "An error occurred while executing the command."
+AmountHigherThanPlaytimeError: "The specified time is greater than the playing time of this player. A player cannot have negative playing time."
+NoConnectionToSQLError: "Could not connect to the database."
+NoPermissionError: "You do not have the permission to do this."
+
+# Debug-Messages:
+PlayerJoin: "Tracking playtime from %s ..."
+PlayerQuit: "Player disconnected. Saving playtime from %s."
+Clear: "The player %s was removed from the database by %s."
+Remove: "The player %s was taken %d %s from %s."
+AddTime: "The player %s was added %d %s from %s."
+PlayerAFK: "Player %s is afk, stop tracking."
+PlayerNotAFK: "Player %s is back, continuing tracking..."
+ConfigReloaded: "Config was reloaded successfully."
+
+# Help-Messages:
+CheckCommandHelpMessage: "Shows you your playing time."
+CheckOthersCommandHelpMessage: "Check the online time of the player."
+TopCommandHelpMessage: "Check out the online time of the top 10 players."
+AddTimeCommandHelpMessage: "Adds the specified time to the player."
+RemoveTimeCommandHelpMessage: "Removes the specified time from the player."
+ClearCommandHelpMessage: "Removes the stored data from the specified player."
+ReloadHelpMessage: "Reloads the config."
+
+# Warnings:
+NoUndoWarning: "Attention: This cannot be undone!"

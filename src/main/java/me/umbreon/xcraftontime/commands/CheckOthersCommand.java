@@ -1,14 +1,14 @@
 package me.umbreon.xcraftontime.commands;
 
-import me.umbreon.xcraftontime.OnlineTimeTracker;
 import me.umbreon.xcraftontime.handlers.ConfigHandler;
 import me.umbreon.xcraftontime.handlers.DatabaseHandler;
-import org.bukkit.Bukkit;
+import me.umbreon.xcraftontime.handlers.TimeHandler;
+import me.umbreon.xcraftontime.utils.TimeConverter;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,57 +17,72 @@ import java.util.concurrent.TimeUnit;
 
 public class CheckOthersCommand {
 
-    private OnlineTimeTracker onlineTimeTracker;
-    private ConfigHandler config;
-    private DatabaseHandler database;
+    private ConfigHandler configHandler;
+    private DatabaseHandler databaseHandler;
+    private TimeHandler timeHandler;
 
-    public CheckOthersCommand( OnlineTimeTracker onlineTimeTracker ) {
-        this.onlineTimeTracker = onlineTimeTracker;
-        config = this.onlineTimeTracker.getConfigHandler();
-        database = this.onlineTimeTracker.getDatabaseHandler();
+    public CheckOthersCommand(TimeHandler timeHandler, ConfigHandler configHandler, DatabaseHandler databaseHandler) {
+        this.configHandler = configHandler;
+        this.databaseHandler = databaseHandler;
+        this.timeHandler = timeHandler;
     }
 
-    public void checkOther(Player sender, OfflinePlayer target){
-        if (sender.hasPermission("xcraftontime.check.others")){
-            try {
-                if (database.checkConnection()){
-                    UUID uuid = target.getUniqueId();
-                    Date joined = new Date(sender.getFirstPlayed());
-                    SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-                    if (target.isOnline()){
-                        int time = ((int) TimeUnit.SECONDS.convert(Calendar.getInstance().getTime().getTime() - database.cache.get(sender.getUniqueId()).getTime(), TimeUnit.MILLISECONDS) + database.getPlaytime(uuid));
-                        long TotalDays = time / (24 * 3600);
-                        time = time % (24 * 3600);
-                        long TotalHours = time / 3600;
-                        time %= 3600;
-                        long TotalMins = time / 60 ;
-                        sender.sendMessage(config.getPluginPrefix() + " " + config.getPlayerName() + ChatColor.RESET + ChatColor.BOLD + " " + target.getName());
-                        sender.sendMessage(config.getPluginPrefix() + " " + config.getPlayTime() + " " + TotalDays + " " + config.getDaysValue() + " " + TotalHours + " " + config.getHoursValue() + " " + TotalMins + " " + config.getMinutesValue());
-                        if (sender.hasPermission("xcraftontime.see.othersdate")) {
-                            sender.sendMessage(config.getPluginPrefix() + " " + config.getJoinDate() + " " + DATE_FORMAT.format(joined));
-                        }
+    public void checkOther(Player player, OfflinePlayer offlinePlayer) {
+        if (player instanceof ConsoleCommandSender){
+            return;
+        }
 
-                    } else {
-                        long time = database.getPlaytime(uuid);
-                        long TotalDays = time / (24 * 3600);
-                        time = time % (24 * 3600);
-                        long TotalHours = time / 3600;
-                        time %= 3600;
-                        long TotalMins = time / 60 ;
-                        sender.sendMessage(config.getPluginPrefix() + " " + config.getPlayerName() + ChatColor.RESET + ChatColor.BOLD + " " + target.getName());
-                        sender.sendMessage(config.getPluginPrefix() + " " + config.getPlayTime() + " " + TotalDays + config.getDaysValue() + " " + TotalHours + " " + config.getHoursValue() + " " + TotalMins + " " + config.getMinutesValue());
-                        if (sender.hasPermission("xcraftontime.see.othersdate")) {
-                            sender.sendMessage(config.getPluginPrefix() + " " + config.getJoinDate() + " " + DATE_FORMAT.format(joined));
-                        }
-                    }
-                }
-            } catch (SQLException e) {
-                Bukkit.getLogger().info("[XCraftOntime] Couldn't connect to database!");
+        if (!player.hasPermission("xcraftontime.check.others")) {
+            player.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" + " " + ChatColor.RED + configHandler.NoPermissionError());
+            return;
+        }
+
+        UUID uuid = offlinePlayer.getUniqueId();
+        Date joined = new Date(offlinePlayer.getFirstPlayed());
+        SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+        if (offlinePlayer.isOnline()) {
+            int time = ((int) TimeUnit.SECONDS.convert(Calendar.getInstance().getTime().getTime() -
+                    timeHandler.cache.get(player.getUniqueId()).toEpochMilli(), TimeUnit.MILLISECONDS) +
+                    databaseHandler.getPlaytime(uuid));
+            player.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" +
+                    " " + ChatColor.GOLD + configHandler.nameString() + ChatColor.RESET + ChatColor.BOLD +
+                    ChatColor.RESET +
+                    ChatColor.BOLD +
+                    " " + offlinePlayer.getName());
+            player.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" +
+                    " " + ChatColor.GOLD + configHandler.playtimeString() + ChatColor.RESET + ChatColor.BOLD +
+                    " " + TimeConverter.secondsToDays(time) +
+                    " " + configHandler.daysString() +
+                    " " + TimeConverter.secondsToHours(time) +
+                    " " + configHandler.hoursString() +
+                    " " + TimeConverter.secondsToMinutes(time) +
+                    " " + configHandler.minutesString());
+            if (player.hasPermission("xcraftontime.seeothersdate")) {
+                player.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" +
+                        " " + ChatColor.GOLD + configHandler.joinedAtString() + ChatColor.RESET + ChatColor.BOLD +
+                        " " + DATE_FORMAT.format(joined));
             }
+
         } else {
-            sender.sendMessage(config.getPluginPrefix() + config.NoPermissionError());
+            int time = databaseHandler.getPlaytime(uuid);
+            player.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" +
+                    " " + ChatColor.GOLD + configHandler.nameString() + ChatColor.RESET + ChatColor.BOLD +
+                    ChatColor.RESET +
+                    ChatColor.BOLD +
+                    " " + databaseHandler.getPlayerName(offlinePlayer.getUniqueId()));
+            player.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" +
+                    " " + ChatColor.GOLD + configHandler.playtimeString() + ChatColor.RESET + ChatColor.BOLD +
+                    " " + TimeConverter.secondsToDays(time) +
+                    " " + configHandler.daysString() +
+                    " " + TimeConverter.secondsToHours(time) +
+                    " " + configHandler.hoursString() +
+                    " " + TimeConverter.secondsToMinutes(time) +
+                    " " + configHandler.minutesString());
+            if (player.hasPermission("xcraftontime.seeothersdate")) {
+                player.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" +
+                        " " + ChatColor.GOLD + configHandler.joinedAtString() + ChatColor.RESET + ChatColor.BOLD +
+                        " " + DATE_FORMAT.format(joined));
+            }
         }
     }
-
 }
-

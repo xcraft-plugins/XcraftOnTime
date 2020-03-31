@@ -3,15 +3,14 @@ package me.umbreon.xcraftontime.handlers;
 import me.umbreon.xcraftontime.OnlineTimeTracker;
 import me.umbreon.xcraftontime.commands.*;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class CommandHandler implements CommandExecutor {
-
-    private OnlineTimeTracker onlineTimeTracker;
+public class CommandHandler extends TabCompleterHandler implements CommandExecutor {
 
     private CheckCommand checkCommand;
     private AddTimeCommand addTimeCommand;
@@ -19,44 +18,50 @@ public class CommandHandler implements CommandExecutor {
     private HelpCommand helpCommand;
     private RemoveTimeCommand removeTimeCommand;
     private TopCommand topCommand;
-    private MoveStatsCommand moveStatsCommand;
-    private DeletePlayerCommand deletePlayerCommand;
+    private ClearCommand deletePlayerCommand;
+    private DatabaseHandler databaseHandler;
+    private ConfigHandler configHandler;
+    private OnlineTimeTracker onlineTimeTracker;
+    private TimeHandler timeHandler;
+    private ReloadCommand reloadCommand;
 
-    public CommandHandler(OnlineTimeTracker onlineTimeTracker ) {
+    public CommandHandler(DatabaseHandler databaseHandler, ConfigHandler configHandler, TimeHandler timeHandler, OnlineTimeTracker onlineTimeTracker) {
+        this.databaseHandler = databaseHandler;
+        this.configHandler = configHandler;
+        this.timeHandler = timeHandler;
         this.onlineTimeTracker = onlineTimeTracker;
         initCommands();
     }
 
     private void initCommands() {
-        addTimeCommand = new AddTimeCommand(onlineTimeTracker);
-        checkCommand = new CheckCommand(onlineTimeTracker);
-        checkOthersCommand = new CheckOthersCommand(onlineTimeTracker);
-        helpCommand = new HelpCommand(onlineTimeTracker.getConfigHandler());
-        removeTimeCommand = new RemoveTimeCommand(onlineTimeTracker);
-        topCommand = new TopCommand(onlineTimeTracker);
-        moveStatsCommand = new MoveStatsCommand(onlineTimeTracker);
-        deletePlayerCommand = new DeletePlayerCommand(onlineTimeTracker);
+        addTimeCommand = new AddTimeCommand(configHandler, databaseHandler);
+        checkCommand = new CheckCommand(configHandler, databaseHandler, timeHandler);
+        checkOthersCommand = new CheckOthersCommand(timeHandler, configHandler, databaseHandler);
+        helpCommand = new HelpCommand(configHandler);
+        removeTimeCommand = new RemoveTimeCommand(configHandler, databaseHandler);
+        topCommand = new TopCommand(configHandler, databaseHandler);
+        deletePlayerCommand = new ClearCommand(configHandler, databaseHandler);
+        reloadCommand = new ReloadCommand(onlineTimeTracker, configHandler);
     }
 
-    @Deprecated
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String s, String[] args ) {
-        if ( args.length > 0 ) {
-            handleArgsAvailable( sender, args );
+    public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
+        if (args.length > 0) {
+            handleArgsAvailable(sender, args);
         } else {
-            handleNoArgsAvailable( sender );
+            handleNoArgsAvailable(sender);
         }
         return false;
     }
 
-    private void handleNoArgsAvailable( CommandSender sender ) {
-        if ( sender.hasPermission( "xcraftontime.check" ) ) {
-            checkCommand.checkPlayerCommand( (Player) sender );
+    private void handleNoArgsAvailable(CommandSender sender) {
+        if (sender.hasPermission("xcraftontime.check")) {
+            checkCommand.checkPlayerCommand((Player) sender);
         }
     }
 
-    private void handleArgsAvailable( CommandSender sender, String[] args ) {
-        switch ( args[0].toLowerCase() ) {
+    private void handleArgsAvailable(CommandSender sender, String[] args) {
+        switch (args[0].toLowerCase()) {
             case "add":
                 addTimeCommand.executeAddTimeCommand(sender, args);
                 break;
@@ -64,25 +69,25 @@ public class CommandHandler implements CommandExecutor {
                 removeTimeCommand.executeRemoveTimeCommand(sender, args);
                 break;
             case "top":
-                topCommand.showTopList((Player) sender);
+                topCommand.showTopList(sender);
                 break;
             case "help":
             case "info":
-                helpCommand.showHelpPage((Player) sender);
+                helpCommand.showHelpPage(sender);
                 break;
-            case "move":
-                moveStatsCommand.executeMoveStatsCommand(sender, args);
+            case "clear":
+                deletePlayerCommand.executeClearCommand(sender, args);
                 break;
-            case "delete":
-                deletePlayerCommand.executeRemovePlayerCommand(sender, args);
+            case "reload":
+                reloadCommand.reloadConfig((Player) sender);
                 break;
             default:
-                if (sender.hasPermission("xcraftontime.check.others")){
+                if (sender.hasPermission("xcraftontime.check.others")) {
                     OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
                     if (target.hasPlayedBefore()) {
                         checkOthersCommand.checkOther((Player) sender, target);
                     } else {
-                        sender.sendMessage(onlineTimeTracker.getConfigHandler().getPluginPrefix() +  " " + onlineTimeTracker.getConfigHandler().PlayerNotFoundError());
+                        sender.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" + " " + ChatColor.RED + configHandler.PlayerNotFoundError());
                     }
                 }
                 break;

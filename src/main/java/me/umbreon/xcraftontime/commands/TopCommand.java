@@ -1,73 +1,73 @@
 package me.umbreon.xcraftontime.commands;
 
-import me.umbreon.xcraftontime.OnlineTimeTracker;
+import me.umbreon.xcraftontime.data.PlayertimeRecord;
 import me.umbreon.xcraftontime.handlers.ConfigHandler;
 import me.umbreon.xcraftontime.handlers.DatabaseHandler;
+import me.umbreon.xcraftontime.utils.TimeConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.UUID;
+import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 public class TopCommand {
 
-    private OnlineTimeTracker onlineTimeTracker;
-    private ConfigHandler config;
-    private DatabaseHandler database;
+    private ConfigHandler configHandler;
+    private DatabaseHandler databaseHandler;
 
-    public TopCommand( OnlineTimeTracker onlineTimeTracker ) {
-        this.onlineTimeTracker = onlineTimeTracker;
-        config = this.onlineTimeTracker.getConfigHandler();
-        database = this.onlineTimeTracker.getDatabaseHandler();
+    public TopCommand(ConfigHandler configHandler, DatabaseHandler databaseHandler) {
+        this.configHandler = configHandler;
+        this.databaseHandler = databaseHandler;
     }
 
-    public void showTopList(CommandSender commandSender){
-        if (commandSender.hasPermission("xcraftontime.top")){
-            String select  = "SELECT playtime, uuid FROM " + config.getTable() + " ORDER BY playtime DESC";
-            PreparedStatement statement = null;
-            try {
-                statement = database.connection.prepareStatement(select);
-                ResultSet rs = statement.executeQuery();
-                int count = 0;
-                int stat = 1;
-                int top10Max = config.getTopListMax();
-                commandSender.sendMessage(config.getPluginPrefix() + " Spielzeitstatistik - Top " + top10Max + " " + config.getPlayerValues());
-                while (rs.next()){
-                    if (count<top10Max){
-                        OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("uuid")));
-                        String name = player.getName();
-                        int time = rs.getInt("playtime");
-                        long days = time / (24 * 3600);
-                        time = time % (24 * 3600);
-                        long hours = time / 3600;
-                        time %= 3600;
-                        long mins = time / 60 ;
-
-                        if (!(stat<10)) {
-                            commandSender.sendMessage(stat + ": " + ChatColor.GOLD + name + " " + ChatColor.AQUA + days + " " + config.getDaysValue() + " " + hours + " " + config.getHoursValue() + " " + mins + config.getMinutesValue());
-                        } else {
-                            commandSender.sendMessage("  " + stat + ": " + ChatColor.GOLD + name + " " + ChatColor.AQUA + days + " " + config.getDaysValue() + " " + hours + " " + config.getHoursValue() + " " + mins + " " + config.getMinutesValue());
-                        }
-
-                        count++;
-                        stat++;
-                    }
-                }
-            } catch (SQLException e) {
-                Bukkit.getLogger().info( e.toString() );
-
-                String error = config.getPluginPrefix() + " " + config.NoConnectionToSQLError();
-
-                if (commandSender.isOp()){
-                    commandSender.sendMessage(error);
-                }
-            }
+    public void showTopList(CommandSender commandSender) {
+        if (commandSender.hasPermission("xcraftontime.top")) {
+            commandSender.sendMessage(generateTopListMessage());
         } else {
-            commandSender.sendMessage(config.getPluginPrefix() + config.PlayerNotFoundError());
+            commandSender.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" + " " + ChatColor.RED + configHandler.PlayerNotFoundError());
         }
+    }
+
+    private String generateTopListMessage() {
+        StringBuilder stringBuilder = new StringBuilder();
+        int topListMax = configHandler.getTopListMax();
+        int amount = Bukkit.getServer().getOperators().size() + topListMax;
+        LinkedList<PlayertimeRecord> listOfPlayerTimeRecord = databaseHandler.getTopPlayerTimes(amount);
+        stringBuilder
+                .append(ChatColor.WHITE)
+                .append("[")
+                .append(ChatColor.RED)
+                .append(configHandler.pluginPrefixString())
+                .append(ChatColor.WHITE).append("] ")
+                .append(configHandler.statisticsString())
+                .append(" - Top ")
+                .append(topListMax).append(" ")
+                .append(configHandler.playerString());
+        LinkedList<PlayertimeRecord> listOfPlayerWithoutOperator = listOfPlayerTimeRecord.stream().filter(this::isValid).collect(Collectors.toCollection(LinkedList::new));
+        int x = Math.min(listOfPlayerWithoutOperator.size(), configHandler.getTopListMax());
+        for (int i = 0; i < x; i++) {
+            buildMessage(i, listOfPlayerWithoutOperator.get(i), stringBuilder);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    private boolean isValid(PlayertimeRecord playertimeRecord) {
+        return !Bukkit.getOfflinePlayer(playertimeRecord.getUuid()).isOp();
+    }
+
+    private void buildMessage(int index, PlayertimeRecord playertimeRecord, StringBuilder stringBuilder) {
+        stringBuilder
+                .append("\n")
+                .append(ChatColor.AQUA)
+                .append(String.format("%2s", index + 1)).append(": ").append(ChatColor.GOLD)
+                .append(playertimeRecord.getPlayername()).append(" ").append(ChatColor.AQUA)
+                .append(TimeConverter.secondsToDays(playertimeRecord.getPlaytime())).append(" ")
+                .append(configHandler.daysString()).append(" ")
+                .append(TimeConverter.secondsToHours(playertimeRecord.getPlaytime())).append(" ")
+                .append(configHandler.hoursString()).append(" ")
+                .append(TimeConverter.secondsToMinutes(playertimeRecord.getPlaytime())).append(" ")
+                .append(configHandler.minutesString());
     }
 }

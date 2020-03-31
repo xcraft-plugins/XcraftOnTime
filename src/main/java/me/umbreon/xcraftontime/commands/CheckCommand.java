@@ -1,64 +1,59 @@
 package me.umbreon.xcraftontime.commands;
 
-import me.umbreon.xcraftontime.OnlineTimeTracker;
 import me.umbreon.xcraftontime.handlers.ConfigHandler;
 import me.umbreon.xcraftontime.handlers.DatabaseHandler;
-import org.bukkit.Bukkit;
+import me.umbreon.xcraftontime.handlers.TimeHandler;
+import me.umbreon.xcraftontime.utils.TimeConverter;
+import org.bukkit.ChatColor;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class CheckCommand {
 
-    private OnlineTimeTracker onlineTimeTracker;
-    private ConfigHandler config;
-    private DatabaseHandler database;
+    private ConfigHandler configHandler;
+    private DatabaseHandler databaseHandler;
+    private TimeHandler timeHandler;
 
-    public CheckCommand( OnlineTimeTracker onlineTimeTracker ) {
-        this.onlineTimeTracker = onlineTimeTracker;
-        config = this.onlineTimeTracker.getConfigHandler();
-        database = this.onlineTimeTracker.getDatabaseHandler();
+    public CheckCommand(ConfigHandler configHandler, DatabaseHandler databaseHandler, TimeHandler timeHandler) {
+        this.configHandler = configHandler;
+        this.databaseHandler = databaseHandler;
+        this.timeHandler = timeHandler;
     }
 
-    public void checkPlayerCommand( Player sender ){
-        if (sender.hasPermission("xcraftontime.check")){
-            try {
-                if ( database.checkConnection() ) {
-                    UUID uuid = sender.getUniqueId();
-                    int time = ((int) TimeUnit.SECONDS.convert(Calendar.getInstance().getTime().getTime() - onlineTimeTracker.getDatabaseHandler().cache.get(sender.getUniqueId()).getTime(), TimeUnit.MILLISECONDS) + onlineTimeTracker.getDatabaseHandler().getPlaytime(uuid));
-                    long TotalDays = time / (24 * 3600);
-                    time = time % (24 * 3600);
-                    long TotalHours = time / 3600;
-                    time %= 3600;
-                    long TotalMins = time / 60;
+    public void checkPlayerCommand(Player player) {
+        if (player instanceof ConsoleCommandSender){
+            return;
+        }
 
-                    Date joined = new Date(sender.getFirstPlayed());
-                    SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-                    sender.sendMessage( config.getPluginPrefix() + " " + config.getPlayerName() + " " + sender.getName());
-                    sender.sendMessage(config.getPluginPrefix() + " " + config.getPlayTime() + " " + TotalDays + " " + config.getDaysValue() + " " + TotalHours + " " + config.getHoursValue() + " " + TotalMins + " " + config.getMinutesValue());
+        if (!player.hasPermission("xcraftontime.check")) {
+            player.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" + " " + ChatColor.RED + configHandler.NoPermissionError());
+            return;
+        }
 
-                    if (sender.hasPermission("xcraftontime.seedate")) {
-                        sender.sendMessage(config.getPluginPrefix() + " " + config.getJoinDate() + " " + DATE_FORMAT.format(joined));
-                    }
+        Date joined = new Date(player.getFirstPlayed());
+        SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+        int time = ((int) TimeUnit.SECONDS.convert(Calendar.getInstance().getTime().getTime() -
+                timeHandler.cache.get(player.getUniqueId()).toEpochMilli(), TimeUnit.MILLISECONDS) +
+                databaseHandler.getPlaytime(player.getUniqueId())
+        );
 
-                }
+        player.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" +  " " + ChatColor.GOLD + configHandler.nameString() + ChatColor.RESET + ChatColor.BOLD + " " + player.getName());
 
-            } catch (SQLException e) {
-                Bukkit.getLogger().info( e.toString() );
+        player.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" +
+                " " + ChatColor.GOLD + configHandler.playtimeString() + ChatColor.RESET + ChatColor.BOLD +
+                " " + TimeConverter.secondsToDays(time) + " " + configHandler.daysString() +
+                " " + TimeConverter.secondsToHours(time) + " " + configHandler.hoursString() +
+                " " + TimeConverter.secondsToMinutes(time) + " " + configHandler.minutesString());
 
-                String error = config.getPluginPrefix() + " " + config.NoConnectionToSQLError();
-
-                if (sender.isOp()){
-                    sender.sendMessage(error);
-                }
-            }
-        } else {
-            sender.sendMessage(config.getPluginPrefix() + config.NoPermissionError());
+        if (player.hasPermission("xcraftontime.seedate")) {
+            player.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" +
+                    " " + ChatColor.GOLD + configHandler.joinedAtString() + ChatColor.RESET + ChatColor.BOLD +
+                    " " + DATE_FORMAT.format(joined));
         }
     }
 }

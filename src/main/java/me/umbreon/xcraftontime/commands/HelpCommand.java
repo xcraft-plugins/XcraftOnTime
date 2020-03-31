@@ -8,39 +8,59 @@ public class HelpCommand {
 
     private ConfigHandler configHandler;
 
-    public HelpCommand( ConfigHandler configHandler ) {
+    public HelpCommand(ConfigHandler configHandler) {
         this.configHandler = configHandler;
     }
 
     public void showHelpPage(CommandSender commandSender) {
-        if (commandSender.hasPermission("xcraftontime.help")) {
-            commandSender.sendMessage(configHandler.getPluginPrefix() + " ArdaniaOntimeTracker Hilfeseite:");
-
-            if (commandSender.hasPermission("xcraftontime.check")){
-                commandSender.sendMessage("/ontime - Zeit dir die Onlinezeit von dir an.");
-            }
-
-            if (commandSender.hasPermission("xcraftontime.check.others")){
-                commandSender.sendMessage("/ontime [Spieler] - Zeit dir die Onlinezeit von dem Spieler an.");
-            }
-
-            if (commandSender.hasPermission("xcraftontime.top")){
-                commandSender.sendMessage("/ontime [top] - Zeit dir die Onlinezeit von den 10 besten Spielern an.");
-            }
-
-            if (commandSender.hasPermission("xcraftontime.add")){
-                commandSender.sendMessage("/ontime add [Spieler] [Zeit in Sekunden] - Fügt die angegebene Zeit dem Spieler hinzu.");
-            }
-
-            if (commandSender.hasPermission("xcraftontime.remove")){
-                commandSender.sendMessage("/ontime remove [Spieler] [Zeit in Sekunden] - Entfernt die angegebene Zeit dem Spieler.");
-            }
-
-            if (commandSender.hasPermission("xcraftontime.removeplayer")){
-                commandSender.sendMessage("/ontime player remove [Spieler] - Entfernt die gespeicherten Daten von dem Angebenen Spieler. " + ChatColor.DARK_RED + "Achtung: Das kann nicht wieder rückgängig gemacht werden!");
-            }
-        } else {
-            commandSender.sendMessage(configHandler.getPluginPrefix() + configHandler.PlayerNotFoundError());
+        if (!commandSender.hasPermission("xcraftontime.help")) {
+            commandSender.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" + " " + ChatColor.RED + configHandler.NoPermissionError());
+            return;
         }
+
+        commandSender.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" + " OntimeTracker " + configHandler.helpPageString() + ":");
+
+        String verticalBar = ChatColor.RESET + "| " + ChatColor.AQUA;
+        String verticalBar1 = ChatColor.RESET + "| " + ChatColor.BLUE;
+
+        if (commandSender.hasPermission("xcraftontime.check")) {
+            commandSender.sendMessage(
+                    verticalBar + "/ontime \n" + verticalBar1 + configHandler.CheckCommandHelpMessage());
+        }
+
+        if (commandSender.hasPermission("xcraftontime.check.others")) {
+            commandSender.sendMessage(
+                    verticalBar + "/ontime [" + configHandler.playerString() + "] \n" + verticalBar1 + configHandler.CheckOthersCommandHelpMessage());
+        }
+
+        if (commandSender.hasPermission("xcraftontime.top")) {
+            commandSender.sendMessage(
+                    verticalBar + "/ontime [top]\n" + verticalBar1 + configHandler.TopCommandHelpMessage());
+        }
+
+        if (commandSender.hasPermission("xcraftontime.add")) {
+            commandSender.sendMessage(
+                    verticalBar + "/ontime add [" + configHandler.playerString() + "] [" + configHandler.timeString() + "]\n" + verticalBar1 + configHandler.AddTimeCommandHelpMessage());
+        }
+
+        if (commandSender.hasPermission("xcraftontime.remove")) {
+            commandSender.sendMessage(
+                    verticalBar + "/ontime remove [" + configHandler.playerString() + "] [" + configHandler.timeString() + "]\n" + verticalBar1 + configHandler.RemoveTimeCommandHelpMessage());
+        }
+
+        if (commandSender.hasPermission("xcraftontime.reload")) {
+            commandSender.sendMessage(
+                    verticalBar + "/ontime reload\n" + verticalBar1 + configHandler.ReloadHelpMessage()
+            );
+        }
+
+        if (commandSender.hasPermission("xcraftontime.clear")) {
+            commandSender.sendMessage(
+                    verticalBar + "/ontime clear [" + configHandler.playerString() + "]\n" +
+                            verticalBar1 + configHandler.ClearCommandHelpMessage() + "\n" +
+                            verticalBar + ChatColor.DARK_RED + configHandler.NoUndoWarning());
+        }
+
+        commandSender.sendMessage(ChatColor.GRAY + "Plugin Version 1.0.0 created by Umbreon");
     }
 }

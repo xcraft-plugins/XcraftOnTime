@@ -1,17 +1,18 @@
 main: me.umbreon.xcraftontime.OnlineTimeTracker
-name: XcraftOntime
-version: 1.0.0
-description: Saves the player's playing time on the server to a database.
+name: ${pom.name}
+version: ${pom.version}
+description: Tracks players' online time on the server.
 api-version: 1.15
 depend:
   - Essentials
 authors:
   - Umbreon
+  - ShirleyNekoDev
 prefix: OntimeTracker
 
 commands:
   ontime:
-    description: The default command that executes all actions via the CommandHandler.
+    description: Show and manage the tracked online time of players.
     aliases: [ontimetracker]
 
 permissons:

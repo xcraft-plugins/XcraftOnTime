@@ -8,12 +8,20 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
+import java.util.logging.Logger;
+
 public class AddTimeCommand {
 
+    private final Logger logger;
     private ConfigHandler configHandler;
     private DatabaseHandler databaseHandler;
 
-    public AddTimeCommand(ConfigHandler configHandler, DatabaseHandler databaseHandler) {
+    public AddTimeCommand(
+        Logger logger,
+        ConfigHandler configHandler,
+        DatabaseHandler databaseHandler
+    ) {
+        this.logger = logger;
         this.configHandler = configHandler;
         this.databaseHandler = databaseHandler;
     }
@@ -90,7 +98,7 @@ public class AddTimeCommand {
             }
         }
 
-        Bukkit.getLogger().info(time + "");
+        logger.info(time + "");
 
         try {
             if (time <= 0) {
@@ -109,7 +117,9 @@ public class AddTimeCommand {
                 commandSender.sendMessage(String.format(configHandler.AddTimeMessage(), time, unit, offlinePlayer.getName()));
 
                 if (configHandler.isPluginDebugging()) {
-                    Bukkit.getLogger().info(String.format(configHandler.AddTime(), offlinePlayer.getName(), time, unit, commandSender.getName()));
+                    logger.info(
+                        String.format(configHandler.AddTime(), offlinePlayer.getName(), time, unit, commandSender.getName())
+                    );
                 }
             }
         } catch (NumberFormatException e) {

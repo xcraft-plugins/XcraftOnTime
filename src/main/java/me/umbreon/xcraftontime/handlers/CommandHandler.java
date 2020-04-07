@@ -10,8 +10,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.logging.Logger;
+
 public class CommandHandler extends TabCompleterHandler implements CommandExecutor {
 
+    private final Logger logger;
     private CheckCommand checkCommand;
     private AddTimeCommand addTimeCommand;
     private CheckOthersCommand checkOthersCommand;
@@ -25,7 +28,14 @@ public class CommandHandler extends TabCompleterHandler implements CommandExecut
     private TimeHandler timeHandler;
     private ReloadCommand reloadCommand;
 
-    public CommandHandler(DatabaseHandler databaseHandler, ConfigHandler configHandler, TimeHandler timeHandler, OnlineTimeTracker onlineTimeTracker) {
+    public CommandHandler(
+        Logger logger,
+        DatabaseHandler databaseHandler,
+        ConfigHandler configHandler,
+        TimeHandler timeHandler,
+        OnlineTimeTracker onlineTimeTracker
+    ) {
+        this.logger = logger;
         this.databaseHandler = databaseHandler;
         this.configHandler = configHandler;
         this.timeHandler = timeHandler;
@@ -34,14 +44,14 @@ public class CommandHandler extends TabCompleterHandler implements CommandExecut
     }
 
     private void initCommands() {
-        addTimeCommand = new AddTimeCommand(configHandler, databaseHandler);
+        addTimeCommand = new AddTimeCommand(logger, configHandler, databaseHandler);
         checkCommand = new CheckCommand(configHandler, databaseHandler, timeHandler);
         checkOthersCommand = new CheckOthersCommand(timeHandler, configHandler, databaseHandler);
         helpCommand = new HelpCommand(configHandler);
-        removeTimeCommand = new RemoveTimeCommand(configHandler, databaseHandler);
+        removeTimeCommand = new RemoveTimeCommand(logger, configHandler, databaseHandler);
         topCommand = new TopCommand(configHandler, databaseHandler);
-        deletePlayerCommand = new ClearCommand(configHandler, databaseHandler);
-        reloadCommand = new ReloadCommand(onlineTimeTracker, configHandler);
+        deletePlayerCommand = new ClearCommand(logger, configHandler, databaseHandler);
+        reloadCommand = new ReloadCommand(logger, onlineTimeTracker, configHandler);
     }
 
     @Override

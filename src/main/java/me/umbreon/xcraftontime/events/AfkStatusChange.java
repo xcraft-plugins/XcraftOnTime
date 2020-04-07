@@ -9,14 +9,24 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.util.logging.Logger;
+
 public class AfkStatusChange implements Listener {
 
+    private final Logger logger;
     private DatabaseHandler databaseHandler;
     private TimeHandler timeHandler;
     private ConfigHandler configHandler;
-    private static Essentials essentials = (Essentials) Bukkit.getServer().getPluginManager().getPlugin("Essentials");
+    private static Essentials essentials =
+        (Essentials) Bukkit.getServer().getPluginManager().getPlugin("Essentials");
 
-    public AfkStatusChange(TimeHandler timeHandler, DatabaseHandler databaseHandler, ConfigHandler configHandler) {
+    public AfkStatusChange(
+        Logger logger,
+        TimeHandler timeHandler,
+        DatabaseHandler databaseHandler,
+        ConfigHandler configHandler
+    ) {
+        this.logger = logger;
         this.timeHandler = timeHandler;
         this.databaseHandler = databaseHandler;
         this.configHandler = configHandler;
@@ -27,13 +37,17 @@ public class AfkStatusChange implements Listener {
     public void onAfkStatusChangeEvent(AfkStatusChangeEvent event) {
         if (essentials.getUser(event.getAffected().getBase()).isAfk()) {
             databaseHandler.initPlayer(event.getAffected().getBase());
-            if (configHandler.isPluginDebugging()){
-                Bukkit.getLogger().info(String.format(configHandler.playerIsNotAFK(), event.getAffected().getName()));
+            if (configHandler.isPluginDebugging()) {
+                logger.info(
+                    String.format(configHandler.playerIsNotAFK(), event.getAffected().getName())
+                );
             }
         } else {
             timeHandler.savePlayerTime(event.getAffected().getBase().getUniqueId());
-            if (configHandler.isPluginDebugging()){
-                Bukkit.getLogger().info(String.format(configHandler.playerIsAFK(), event.getAffected().getName()));
+            if (configHandler.isPluginDebugging()) {
+                logger.info(
+                    String.format(configHandler.playerIsAFK(), event.getAffected().getName())
+                );
             }
         }
     }

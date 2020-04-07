@@ -1,7 +1,6 @@
 package me.umbreon.xcraftontime.handlers;
 
 import me.umbreon.xcraftontime.data.PlayertimeRecord;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -9,9 +8,11 @@ import org.bukkit.entity.Player;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public class DatabaseHandler {
 
+    private final Logger logger;
     private ConfigHandler configHandler;
     public static Connection connection;
 
@@ -25,7 +26,11 @@ public class DatabaseHandler {
     private PreparedStatement addPlayerOnlineTimeStatement;
     private PreparedStatement statement;
 
-    public DatabaseHandler(ConfigHandler configHandler) {
+    public DatabaseHandler(
+        Logger logger,
+        ConfigHandler configHandler
+    ) {
+        this.logger = logger;
         this.configHandler = configHandler;
     }
 
@@ -62,7 +67,7 @@ public class DatabaseHandler {
 
             return connection;
         } catch (ClassNotFoundException | SQLException e) {
-            Bukkit.getLogger().info(e.toString());
+            logger.info(e.toString());
             return null;
         }
     }
@@ -73,7 +78,9 @@ public class DatabaseHandler {
                 connection = startup();
 
                 if (connection == null || connection.isClosed()) {
-                    Bukkit.getLogger().info(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" + configHandler.NoConnectionToSQLError());
+                    logger.info(
+                        ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" + configHandler.NoConnectionToSQLError()
+                    );
                     return false;
                 }
 
@@ -91,8 +98,9 @@ public class DatabaseHandler {
                 createNewEntryStatement.setInt(2, 0);
                 createNewEntryStatement.setString(3, player.getName());
                 createNewEntryStatement.executeUpdate();
-                Bukkit.getLogger().info("[" + configHandler.getTable() + "]" + " Created new entry for player " + player.getName());
-
+                logger.info(
+                    "[" + configHandler.getTable() + "]" + " Created new entry for player " + player.getName()
+                );
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -137,7 +145,9 @@ public class DatabaseHandler {
         if (connection != null) {
             try {
                 connection.close();
-                Bukkit.getLogger().info(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" + configHandler.ConnectionToSQLClosedMessage());
+                logger.info(
+                    ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" + configHandler.ConnectionToSQLClosedMessage()
+                );
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -152,7 +162,7 @@ public class DatabaseHandler {
                 updatePlayerOnlineTimeStatement.executeUpdate();
                 return true;
             } catch (SQLException e) {
-                Bukkit.getLogger().info(e.toString());
+                logger.info(e.toString());
             }
         }
         return false;
@@ -165,7 +175,7 @@ public class DatabaseHandler {
                 addPlayerOnlineTimeStatement.setString(2, uuid.toString());
                 addPlayerOnlineTimeStatement.executeUpdate();
             } catch (SQLException e) {
-                Bukkit.getLogger().info(e.toString());
+                logger.info(e.toString());
             }
         }
     }

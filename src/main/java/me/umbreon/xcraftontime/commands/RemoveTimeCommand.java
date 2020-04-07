@@ -8,12 +8,20 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
+import java.util.logging.Logger;
+
 public class RemoveTimeCommand {
 
+    private final Logger logger;
     private ConfigHandler configHandler;
     private DatabaseHandler databaseHandler;
 
-    public RemoveTimeCommand(ConfigHandler configHandler, DatabaseHandler databaseHandler) {
+    public RemoveTimeCommand(
+        Logger logger,
+        ConfigHandler configHandler,
+        DatabaseHandler databaseHandler
+    ) {
+        this.logger = logger;
         this.configHandler = configHandler;
         this.databaseHandler = databaseHandler;
     }
@@ -104,7 +112,9 @@ public class RemoveTimeCommand {
                         commandSender.sendMessage(String.format(configHandler.RemoveTimeMessage(), time, unit, offlinePlayer.getName()));
 
                         if (configHandler.isPluginDebugging()) {
-                            Bukkit.getLogger().info(String.format(configHandler.RemoveTime(), offlinePlayer, time, unit, commandSender));
+                            logger.info(
+                                String.format(configHandler.RemoveTime(), offlinePlayer, time, unit, commandSender)
+                            );
                         }
                     } else {
                         commandSender.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" + " " + configHandler.ExecuteError());

@@ -7,12 +7,20 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
+import java.util.logging.Logger;
+
 public class ClearCommand {
 
+    private Logger logger;
     private ConfigHandler configHandler;
     private DatabaseHandler databaseHandler;
 
-    public ClearCommand(ConfigHandler configHandler, DatabaseHandler databaseHandler) {
+    public ClearCommand(
+        Logger logger,
+        ConfigHandler configHandler,
+        DatabaseHandler databaseHandler
+    ) {
+        this.logger = logger;
         this.configHandler = configHandler;
         this.databaseHandler = databaseHandler;
     }
@@ -28,7 +36,7 @@ public class ClearCommand {
         commandSender.sendMessage(String.format(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" + configHandler.ClearMessage(), offlinePlayer));
 
         if (configHandler.isPluginDebugging()) {
-            Bukkit.getLogger().info(String.format(configHandler.Clear(), offlinePlayer, commandSender));
+            logger.info(String.format(configHandler.Clear(), offlinePlayer, commandSender));
         }
     }
 }

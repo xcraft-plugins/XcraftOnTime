@@ -8,6 +8,7 @@ import me.umbreon.xcraftontime.handlers.ConfigHandler;
 import me.umbreon.xcraftontime.handlers.DatabaseHandler;
 import me.umbreon.xcraftontime.handlers.TimeHandler;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class OnlineTimeTracker extends JavaPlugin {
@@ -20,29 +21,32 @@ public class OnlineTimeTracker extends JavaPlugin {
         saveDefaultConfig();
 
         configHandler = new ConfigHandler(this);
-        databaseHandler = new DatabaseHandler(configHandler);
+        databaseHandler = new DatabaseHandler(getLogger(), configHandler);
         timeHandler = new TimeHandler(this, databaseHandler, configHandler);
 
         initDatabase();
 
-        registerEvents();
-        setCommandExecutor();
+        // register events
+        PluginManager pluginManager = Bukkit.getServer().getPluginManager();
+        pluginManager.registerEvents(
+            new PlayerJoinListener(getLogger(), databaseHandler, timeHandler, configHandler), this
+        );
+        pluginManager.registerEvents(
+            new PlayerQuitListener(getLogger(), timeHandler, configHandler), this
+        );
+        pluginManager.registerEvents(
+            new AfkStatusChange(getLogger(), timeHandler, databaseHandler, configHandler), this
+        );
 
+        // register command handler
+        getCommand("ontime").setExecutor(
+            new CommandHandler(getLogger(), databaseHandler, configHandler, timeHandler, this)
+        );
     }
 
     private void initDatabase() {
         databaseHandler.startup();
         timeHandler.startTimedSaving();
-    }
-
-    private void setCommandExecutor() {
-        getCommand("ontime").setExecutor(new CommandHandler(databaseHandler, configHandler, timeHandler, this));
-    }
-
-    private void registerEvents() {
-        Bukkit.getServer().getPluginManager().registerEvents(new PlayerJoinListener(databaseHandler, timeHandler, configHandler), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new PlayerQuitListener(timeHandler, configHandler), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new AfkStatusChange(timeHandler, databaseHandler, configHandler), this);
     }
 
     public void onDisable() {

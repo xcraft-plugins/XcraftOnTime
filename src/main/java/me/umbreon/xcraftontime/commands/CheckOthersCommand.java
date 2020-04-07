@@ -17,9 +17,9 @@ import java.util.concurrent.TimeUnit;
 
 public class CheckOthersCommand {
 
-    private ConfigHandler configHandler;
-    private DatabaseHandler databaseHandler;
-    private TimeHandler timeHandler;
+    private final ConfigHandler configHandler;
+    private final DatabaseHandler databaseHandler;
+    private final TimeHandler timeHandler;
 
     public CheckOthersCommand(TimeHandler timeHandler, ConfigHandler configHandler, DatabaseHandler databaseHandler) {
         this.configHandler = configHandler;

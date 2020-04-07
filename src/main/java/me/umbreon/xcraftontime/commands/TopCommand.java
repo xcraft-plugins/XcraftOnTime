@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 
 public class TopCommand {
 
-    private ConfigHandler configHandler;
-    private DatabaseHandler databaseHandler;
+    private final ConfigHandler configHandler;
+    private final DatabaseHandler databaseHandler;
 
     public TopCommand(ConfigHandler configHandler, DatabaseHandler databaseHandler) {
         this.configHandler = configHandler;

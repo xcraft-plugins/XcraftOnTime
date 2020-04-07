@@ -13,8 +13,8 @@ import java.util.logging.Logger;
 public class AddTimeCommand {
 
     private final Logger logger;
-    private ConfigHandler configHandler;
-    private DatabaseHandler databaseHandler;
+    private final ConfigHandler configHandler;
+    private final DatabaseHandler databaseHandler;
 
     public AddTimeCommand(
         Logger logger,

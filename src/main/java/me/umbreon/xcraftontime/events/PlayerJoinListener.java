@@ -13,9 +13,9 @@ import java.util.logging.Logger;
 public class PlayerJoinListener implements Listener {
 
     private final Logger logger;
-    private TimeHandler timeHandler;
-    private DatabaseHandler databaseHandler;
-    private ConfigHandler configHandler;
+    private final TimeHandler timeHandler;
+    private final DatabaseHandler databaseHandler;
+    private final ConfigHandler configHandler;
 
     public PlayerJoinListener(
         Logger logger,

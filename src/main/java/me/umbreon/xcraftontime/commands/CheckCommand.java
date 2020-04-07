@@ -15,9 +15,9 @@ import java.util.concurrent.TimeUnit;
 
 public class CheckCommand {
 
-    private ConfigHandler configHandler;
-    private DatabaseHandler databaseHandler;
-    private TimeHandler timeHandler;
+    private final ConfigHandler configHandler;
+    private final DatabaseHandler databaseHandler;
+    private final TimeHandler timeHandler;
 
     public CheckCommand(ConfigHandler configHandler, DatabaseHandler databaseHandler, TimeHandler timeHandler) {
         this.configHandler = configHandler;

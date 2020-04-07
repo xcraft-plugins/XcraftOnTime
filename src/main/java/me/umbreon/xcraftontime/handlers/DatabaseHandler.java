@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 public class DatabaseHandler {
 
     private final Logger logger;
-    private ConfigHandler configHandler;
+    private final ConfigHandler configHandler;
     public static Connection connection;
 
     private PreparedStatement getPlayernameByUuidStatement;

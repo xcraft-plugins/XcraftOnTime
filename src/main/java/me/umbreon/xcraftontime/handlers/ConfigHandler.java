@@ -5,7 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class ConfigHandler {
 
-    private FileConfiguration configuration;
+    private final FileConfiguration configuration;
 
     public ConfigHandler(JavaPlugin plugin) {
         plugin.saveDefaultConfig();

@@ -14,9 +14,9 @@ import java.util.logging.Logger;
 public class AfkStatusChange implements Listener {
 
     private final Logger logger;
-    private DatabaseHandler databaseHandler;
-    private TimeHandler timeHandler;
-    private ConfigHandler configHandler;
+    private final DatabaseHandler databaseHandler;
+    private final TimeHandler timeHandler;
+    private final ConfigHandler configHandler;
     private static Essentials essentials =
         (Essentials) Bukkit.getServer().getPluginManager().getPlugin("Essentials");
 

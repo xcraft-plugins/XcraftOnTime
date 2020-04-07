@@ -9,8 +9,8 @@ import java.util.logging.Logger;
 public class ReloadCommand {
 
     private final Logger logger;
-    private OnlineTimeTracker onlineTimeTracker;
-    private ConfigHandler configHandler;
+    private final OnlineTimeTracker onlineTimeTracker;
+    private final ConfigHandler configHandler;
 
     public ReloadCommand(
         Logger logger,

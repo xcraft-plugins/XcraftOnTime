@@ -11,8 +11,8 @@ import java.util.logging.Logger;
 public class PlayerQuitListener implements Listener {
 
     private final Logger logger;
-    private ConfigHandler configHandler;
-    private TimeHandler timeHandler;
+    private final ConfigHandler configHandler;
+    private final TimeHandler timeHandler;
 
     public PlayerQuitListener(
         Logger logger,

@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 
 public class HelpCommand {
 
-    private ConfigHandler configHandler;
+    private final ConfigHandler configHandler;
 
     public HelpCommand(ConfigHandler configHandler) {
         this.configHandler = configHandler;

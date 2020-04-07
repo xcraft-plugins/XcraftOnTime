@@ -12,9 +12,9 @@ import java.util.concurrent.TimeUnit;
 
 public class TimeHandler {
 
-    private OnlineTimeTracker onlineTimeTracker;
-    private DatabaseHandler databaseHandler;
-    private ConfigHandler configHandler;
+    private final OnlineTimeTracker onlineTimeTracker;
+    private final DatabaseHandler databaseHandler;
+    private final ConfigHandler configHandler;
 
     public Map<UUID, Instant> cache = new HashMap<>();
 

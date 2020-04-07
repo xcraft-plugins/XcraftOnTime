@@ -14,19 +14,15 @@ import java.util.logging.Logger;
 
 public class CommandHandler extends TabCompleterHandler implements CommandExecutor {
 
-    private final Logger logger;
-    private CheckCommand checkCommand;
-    private AddTimeCommand addTimeCommand;
-    private CheckOthersCommand checkOthersCommand;
-    private HelpCommand helpCommand;
-    private RemoveTimeCommand removeTimeCommand;
-    private TopCommand topCommand;
-    private ClearCommand deletePlayerCommand;
-    private DatabaseHandler databaseHandler;
-    private ConfigHandler configHandler;
-    private OnlineTimeTracker onlineTimeTracker;
-    private TimeHandler timeHandler;
-    private ReloadCommand reloadCommand;
+    private final CheckCommand checkCommand;
+    private final AddTimeCommand addTimeCommand;
+    private final CheckOthersCommand checkOthersCommand;
+    private final HelpCommand helpCommand;
+    private final RemoveTimeCommand removeTimeCommand;
+    private final TopCommand topCommand;
+    private final ClearCommand deletePlayerCommand;
+    private final ConfigHandler configHandler;
+    private final ReloadCommand reloadCommand;
 
     public CommandHandler(
         Logger logger,
@@ -35,15 +31,8 @@ public class CommandHandler extends TabCompleterHandler implements CommandExecut
         TimeHandler timeHandler,
         OnlineTimeTracker onlineTimeTracker
     ) {
-        this.logger = logger;
-        this.databaseHandler = databaseHandler;
         this.configHandler = configHandler;
-        this.timeHandler = timeHandler;
-        this.onlineTimeTracker = onlineTimeTracker;
-        initCommands();
-    }
 
-    private void initCommands() {
         addTimeCommand = new AddTimeCommand(logger, configHandler, databaseHandler);
         checkCommand = new CheckCommand(configHandler, databaseHandler, timeHandler);
         checkOthersCommand = new CheckOthersCommand(timeHandler, configHandler, databaseHandler);

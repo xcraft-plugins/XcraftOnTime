@@ -11,9 +11,9 @@ import java.util.logging.Logger;
 
 public class ClearCommand {
 
-    private Logger logger;
-    private ConfigHandler configHandler;
-    private DatabaseHandler databaseHandler;
+    private final Logger logger;
+    private final ConfigHandler configHandler;
+    private final DatabaseHandler databaseHandler;
 
     public ClearCommand(
         Logger logger,

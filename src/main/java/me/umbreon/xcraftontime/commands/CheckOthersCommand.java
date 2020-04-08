@@ -28,7 +28,7 @@ public class CheckOthersCommand {
     }
 
     public void checkOther(Player player, OfflinePlayer offlinePlayer) {
-        if (player instanceof ConsoleCommandSender){
+        if (player instanceof ConsoleCommandSender) {
             return;
         }
 

@@ -26,7 +26,7 @@ public class ConfigHandler {
 
     // Strings
 
-    public String timeString(){
+    public String timeString() {
         return configuration.getString("Time");
     }
 
@@ -154,11 +154,11 @@ public class ConfigHandler {
 
     // Debug-Messages:
 
-    public String PlayerJoin(){
+    public String PlayerJoin() {
         return configuration.getString("PlayerJoin");
     }
 
-    public String PlayerQuit(){
+    public String PlayerQuit() {
         return configuration.getString("PlayerQuit");
     }
 
@@ -174,37 +174,37 @@ public class ConfigHandler {
         return configuration.getString("RemoveTime");
     }
 
-    public String playerIsAFK(){
+    public String playerIsAFK() {
         return configuration.getString("PlayerIsAFK");
     }
 
-    public String playerIsNotAFK(){
+    public String playerIsNotAFK() {
         return configuration.getString("PlayerIsNotAFK");
     }
 
-    public String configReloaded(){
+    public String configReloaded() {
         return configuration.getString("ConfigReloaded");
     }
 
     // Help-Messages:
 
-    public String CheckOthersCommandHelpMessage(){
+    public String CheckOthersCommandHelpMessage() {
         return configuration.getString("CheckOthersCommandHelpMessage");
     }
 
-    public String CheckCommandHelpMessage(){
+    public String CheckCommandHelpMessage() {
         return configuration.getString("CheckCommandHelpMessage");
     }
 
-    public String TopCommandHelpMessage(){
+    public String TopCommandHelpMessage() {
         return configuration.getString("TopCommandHelpMessage");
     }
 
-    public String AddTimeCommandHelpMessage(){
+    public String AddTimeCommandHelpMessage() {
         return configuration.getString("AddTimeCommandHelpMessage");
     }
 
-    public String RemoveTimeCommandHelpMessage(){
+    public String RemoveTimeCommandHelpMessage() {
         return configuration.getString("RemoveTimeCommandHelpMessage");
     }
 
@@ -212,13 +212,13 @@ public class ConfigHandler {
         return configuration.getString("ClearCommandHelpMessage");
     }
 
-    public String ReloadHelpMessage(){
+    public String ReloadHelpMessage() {
         return configuration.getString("ReloadHelpMessage");
     }
 
     // Warnings:
 
-    public String NoUndoWarning(){
+    public String NoUndoWarning() {
         return configuration.getString("NoUndoWarning");
     }
 }

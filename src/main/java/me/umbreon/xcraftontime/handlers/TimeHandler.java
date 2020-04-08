@@ -28,11 +28,11 @@ public class TimeHandler {
         this.configHandler = configHandler;
     }
 
-    public void putTimeInCache(UUID uuid, Instant date){
+    public void putTimeInCache(UUID uuid, Instant date) {
         cache.put(uuid, date);
     }
 
-    public void savePlayerTime(UUID uuid){
+    public void savePlayerTime(UUID uuid) {
         long playedTime;
         if (cache.get(uuid) == null) {
             playedTime = 0;
@@ -52,7 +52,7 @@ public class TimeHandler {
         }, 0L, 20L * SleepTimer * 60);
     }
 
-    public void saveAllPlayerTime(){
+    public void saveAllPlayerTime() {
         for (UUID uuid : cache.keySet()) {
             savePlayerTime(uuid);
         }

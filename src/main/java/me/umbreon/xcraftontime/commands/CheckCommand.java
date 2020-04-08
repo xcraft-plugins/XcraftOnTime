@@ -26,7 +26,7 @@ public class CheckCommand {
     }
 
     public void checkPlayerCommand(Player player) {
-        if (player instanceof ConsoleCommandSender){
+        if (player instanceof ConsoleCommandSender) {
             return;
         }
 

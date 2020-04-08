@@ -24,7 +24,7 @@ public class TimeConverter {
         return hours * 3600;
     }
 
-    public static long minutesToSeconds(long minutes){
+    public static long minutesToSeconds(long minutes) {
         return minutes * 60;
     }
 }

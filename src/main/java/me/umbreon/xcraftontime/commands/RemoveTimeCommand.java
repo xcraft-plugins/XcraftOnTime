@@ -47,7 +47,7 @@ public class RemoveTimeCommand {
 
 
         for (int i = 2; i < args.length; i++) {
-            if (args[i].length() < 2  || args.length > 6){
+            if (args[i].length() < 2 || args.length > 6) {
                 return;
             }
             switch (args[i].substring(args[i].length() - 1)) {

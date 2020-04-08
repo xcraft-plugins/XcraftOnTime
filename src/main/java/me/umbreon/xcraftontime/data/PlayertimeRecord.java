@@ -22,7 +22,7 @@ public class PlayertimeRecord {
         return playtime;
     }
 
-    public UUID getUuid(){
+    public UUID getUuid() {
         return uuid;
     }
 }

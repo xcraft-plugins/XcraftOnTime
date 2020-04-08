@@ -5,7 +5,7 @@
 
     <groupId>me.umbreon.xcraftontime</groupId>
     <artifactId>XcraftOntime</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <name>XcraftOntime</name>
     <url>https://github.com/xcraft-plugins/XcraftOntime</url>
@@ -36,7 +36,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
+                <version>3.8.1</version>
             </plugin>
         </plugins>
     </build>

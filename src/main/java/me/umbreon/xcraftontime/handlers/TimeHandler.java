@@ -1,8 +1,8 @@
 package me.umbreon.xcraftontime.handlers;
 
-import me.umbreon.xcraftontime.OnlineTimeTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -12,14 +12,18 @@ import java.util.concurrent.TimeUnit;
 
 public class TimeHandler {
 
-    private final OnlineTimeTracker onlineTimeTracker;
+    private final JavaPlugin plugin;
     private final DatabaseHandler databaseHandler;
     private final ConfigHandler configHandler;
 
     public Map<UUID, Instant> cache = new HashMap<>();
 
-    public TimeHandler(OnlineTimeTracker onlineTimeTracker, DatabaseHandler databaseHandler, ConfigHandler configHandler){
-        this.onlineTimeTracker = onlineTimeTracker;
+    public TimeHandler(
+        JavaPlugin plugin,
+        DatabaseHandler databaseHandler,
+        ConfigHandler configHandler
+    ) {
+        this.plugin = plugin;
         this.databaseHandler = databaseHandler;
         this.configHandler = configHandler;
     }
@@ -41,12 +45,9 @@ public class TimeHandler {
 
     public void startTimedSaving() {
         int SleepTimer = (int) configHandler.autoSavePeriod();
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(onlineTimeTracker, new Runnable() {
-            @Override
-            public void run() {
-                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    savePlayerTime( player.getUniqueId());
-                }
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                savePlayerTime(player.getUniqueId());
             }
         }, 0L, 20L * SleepTimer * 60);
     }

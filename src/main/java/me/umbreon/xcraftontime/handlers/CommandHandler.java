@@ -1,6 +1,6 @@
 package me.umbreon.xcraftontime.handlers;
 
-import me.umbreon.xcraftontime.OnlineTimeTracker;
+import me.umbreon.xcraftontime.XcraftOnTimePlugin;
 import me.umbreon.xcraftontime.commands.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,15 +21,16 @@ public class CommandHandler extends TabCompleterHandler implements CommandExecut
     private final RemoveTimeCommand removeTimeCommand;
     private final TopCommand topCommand;
     private final ClearCommand deletePlayerCommand;
-    private final ConfigHandler configHandler;
     private final ReloadCommand reloadCommand;
+
+    private final ConfigHandler configHandler;
 
     public CommandHandler(
         Logger logger,
         DatabaseHandler databaseHandler,
         ConfigHandler configHandler,
         TimeHandler timeHandler,
-        OnlineTimeTracker onlineTimeTracker
+        XcraftOnTimePlugin onlineTimeTracker
     ) {
         this.configHandler = configHandler;
 

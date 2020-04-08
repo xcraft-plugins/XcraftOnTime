@@ -11,7 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class OnlineTimeTracker extends JavaPlugin {
+public class XcraftOnTimePlugin extends JavaPlugin {
 
     private DatabaseHandler databaseHandler;
     private ConfigHandler configHandler;

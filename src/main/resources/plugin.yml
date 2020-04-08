@@ -1,4 +1,4 @@
-main: me.umbreon.xcraftontime.OnlineTimeTracker
+main: me.umbreon.xcraftontime.XcraftOnTimePlugin
 name: ${pom.name}
 version: ${pom.version}
 description: Tracks players' online time on the server.

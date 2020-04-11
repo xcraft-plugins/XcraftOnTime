@@ -2,7 +2,7 @@ package me.umbreon.xcraftontime.commands;
 
 import me.umbreon.xcraftontime.handlers.ConfigHandler;
 import me.umbreon.xcraftontime.handlers.DatabaseHandler;
-import me.umbreon.xcraftontime.handlers.TimeHandler;
+import me.umbreon.xcraftontime.TimeTracker;
 import me.umbreon.xcraftontime.utils.TimeConverter;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -19,12 +19,12 @@ public class CheckOthersCommand {
 
     private final ConfigHandler configHandler;
     private final DatabaseHandler databaseHandler;
-    private final TimeHandler timeHandler;
+    private final TimeTracker timeTracker;
 
-    public CheckOthersCommand(TimeHandler timeHandler, ConfigHandler configHandler, DatabaseHandler databaseHandler) {
+    public CheckOthersCommand(TimeTracker timeTracker, ConfigHandler configHandler, DatabaseHandler databaseHandler) {
         this.configHandler = configHandler;
         this.databaseHandler = databaseHandler;
-        this.timeHandler = timeHandler;
+        this.timeTracker = timeTracker;
     }
 
     public void checkOther(Player player, OfflinePlayer offlinePlayer) {
@@ -42,7 +42,7 @@ public class CheckOthersCommand {
         SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         if (offlinePlayer.isOnline()) {
             int time = ((int) TimeUnit.SECONDS.convert(Calendar.getInstance().getTime().getTime() -
-                    timeHandler.cache.get(player.getUniqueId()).toEpochMilli(), TimeUnit.MILLISECONDS) +
+                    timeTracker.cache.get(player.getUniqueId()).toEpochMilli(), TimeUnit.MILLISECONDS) +
                     databaseHandler.getPlaytime(uuid));
             player.sendMessage(ChatColor.WHITE + "[" + ChatColor.RED + configHandler.pluginPrefixString() + ChatColor.WHITE + "]" +
                     " " + ChatColor.GOLD + configHandler.nameString() + ChatColor.RESET + ChatColor.BOLD +

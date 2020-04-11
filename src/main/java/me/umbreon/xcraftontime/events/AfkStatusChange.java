@@ -3,7 +3,7 @@ package me.umbreon.xcraftontime.events;
 import com.earth2me.essentials.Essentials;
 import me.umbreon.xcraftontime.handlers.ConfigHandler;
 import me.umbreon.xcraftontime.handlers.DatabaseHandler;
-import me.umbreon.xcraftontime.handlers.TimeHandler;
+import me.umbreon.xcraftontime.TimeTracker;
 import net.ess3.api.events.AfkStatusChangeEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -15,19 +15,19 @@ public class AfkStatusChange implements Listener {
 
     private final Logger logger;
     private final DatabaseHandler databaseHandler;
-    private final TimeHandler timeHandler;
+    private final TimeTracker timeTracker;
     private final ConfigHandler configHandler;
     private static Essentials essentials =
         (Essentials) Bukkit.getServer().getPluginManager().getPlugin("Essentials");
 
     public AfkStatusChange(
         Logger logger,
-        TimeHandler timeHandler,
+        TimeTracker timeTracker,
         DatabaseHandler databaseHandler,
         ConfigHandler configHandler
     ) {
         this.logger = logger;
-        this.timeHandler = timeHandler;
+        this.timeTracker = timeTracker;
         this.databaseHandler = databaseHandler;
         this.configHandler = configHandler;
     }
@@ -43,7 +43,7 @@ public class AfkStatusChange implements Listener {
                 );
             }
         } else {
-            timeHandler.savePlayerTime(event.getAffected().getBase().getUniqueId());
+            timeTracker.savePlayerTime(event.getAffected().getBase().getUniqueId());
             if (configHandler.isPluginDebugging()) {
                 logger.info(
                     String.format(configHandler.playerIsAFK(), event.getAffected().getName())

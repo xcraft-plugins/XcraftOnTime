@@ -2,39 +2,48 @@ package me.umbreon.xcraftontime.events;
 
 import me.umbreon.xcraftontime.handlers.ConfigHandler;
 import me.umbreon.xcraftontime.handlers.DatabaseHandler;
-import me.umbreon.xcraftontime.handlers.TimeHandler;
+import me.umbreon.xcraftontime.TimeTracker;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.time.Instant;
 import java.util.logging.Logger;
 
-public class PlayerJoinListener implements Listener {
+public class PlayerListener implements Listener {
 
     private final Logger logger;
-    private final TimeHandler timeHandler;
+    private final TimeTracker timeTracker;
     private final DatabaseHandler databaseHandler;
     private final ConfigHandler configHandler;
 
-    public PlayerJoinListener(
+    public PlayerListener(
         Logger logger,
         DatabaseHandler databaseHandler,
-        TimeHandler timeHandler,
+        TimeTracker timeTracker,
         ConfigHandler configHandler
     ) {
         this.logger = logger;
         this.databaseHandler = databaseHandler;
-        this.timeHandler = timeHandler;
+        this.timeTracker = timeTracker;
         this.configHandler = configHandler;
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         databaseHandler.initPlayer(event.getPlayer());
-        timeHandler.putTimeInCache(event.getPlayer().getUniqueId(), Instant.now());
+        timeTracker.putTimeInCache(event.getPlayer().getUniqueId(), Instant.now());
         if (configHandler.isPluginDebugging()) {
             logger.info(String.format(configHandler.PlayerJoin(), event.getPlayer().getName()));
+        }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        timeTracker.savePlayerTime(event.getPlayer().getUniqueId());
+        if (configHandler.isPluginDebugging()) {
+            logger.info(String.format(configHandler.PlayerQuit(), event.getPlayer().getName()));
         }
     }
 }

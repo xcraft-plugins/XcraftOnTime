@@ -2,7 +2,7 @@ package me.umbreon.xcraftontime.commands;
 
 import me.umbreon.xcraftontime.handlers.ConfigHandler;
 import me.umbreon.xcraftontime.handlers.DatabaseHandler;
-import me.umbreon.xcraftontime.handlers.TimeHandler;
+import me.umbreon.xcraftontime.TimeTracker;
 import me.umbreon.xcraftontime.utils.TimeConverter;
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
@@ -17,12 +17,12 @@ public class CheckCommand {
 
     private final ConfigHandler configHandler;
     private final DatabaseHandler databaseHandler;
-    private final TimeHandler timeHandler;
+    private final TimeTracker timeTracker;
 
-    public CheckCommand(ConfigHandler configHandler, DatabaseHandler databaseHandler, TimeHandler timeHandler) {
+    public CheckCommand(ConfigHandler configHandler, DatabaseHandler databaseHandler, TimeTracker timeTracker) {
         this.configHandler = configHandler;
         this.databaseHandler = databaseHandler;
-        this.timeHandler = timeHandler;
+        this.timeTracker = timeTracker;
     }
 
     public void checkPlayerCommand(Player player) {
@@ -38,7 +38,7 @@ public class CheckCommand {
         Date joined = new Date(player.getFirstPlayed());
         SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         int time = ((int) TimeUnit.SECONDS.convert(Calendar.getInstance().getTime().getTime() -
-                timeHandler.cache.get(player.getUniqueId()).toEpochMilli(), TimeUnit.MILLISECONDS) +
+                timeTracker.cache.get(player.getUniqueId()).toEpochMilli(), TimeUnit.MILLISECONDS) +
                 databaseHandler.getPlaytime(player.getUniqueId())
         );
 

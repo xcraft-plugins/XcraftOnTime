@@ -1,5 +1,7 @@
-package me.umbreon.xcraftontime.handlers;
+package me.umbreon.xcraftontime;
 
+import me.umbreon.xcraftontime.handlers.ConfigHandler;
+import me.umbreon.xcraftontime.handlers.DatabaseHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,7 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class TimeHandler {
+public class TimeTracker {
 
     private final JavaPlugin plugin;
     private final DatabaseHandler databaseHandler;
@@ -18,7 +20,7 @@ public class TimeHandler {
 
     public Map<UUID, Instant> cache = new HashMap<>();
 
-    public TimeHandler(
+    public TimeTracker(
         JavaPlugin plugin,
         DatabaseHandler databaseHandler,
         ConfigHandler configHandler

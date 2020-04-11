@@ -168,7 +168,7 @@ public class DatabaseHandler {
         return false;
     }
 
-    void addPlayerOnlineTime(UUID uuid, long newTime) {
+    public void addPlayerOnlineTime(UUID uuid, long newTime) {
         if (checkConnection()) {
             try {
                 addPlayerOnlineTimeStatement.setLong(1, newTime);

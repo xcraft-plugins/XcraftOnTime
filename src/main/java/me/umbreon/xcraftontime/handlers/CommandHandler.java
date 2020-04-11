@@ -1,5 +1,6 @@
 package me.umbreon.xcraftontime.handlers;
 
+import me.umbreon.xcraftontime.TimeTracker;
 import me.umbreon.xcraftontime.XcraftOnTimePlugin;
 import me.umbreon.xcraftontime.commands.*;
 import org.bukkit.Bukkit;
@@ -29,14 +30,14 @@ public class CommandHandler extends TabCompleterHandler implements CommandExecut
         Logger logger,
         DatabaseHandler databaseHandler,
         ConfigHandler configHandler,
-        TimeHandler timeHandler,
+        TimeTracker timeTracker,
         XcraftOnTimePlugin onlineTimeTracker
     ) {
         this.configHandler = configHandler;
 
         addTimeCommand = new AddTimeCommand(logger, configHandler, databaseHandler);
-        checkCommand = new CheckCommand(configHandler, databaseHandler, timeHandler);
-        checkOthersCommand = new CheckOthersCommand(timeHandler, configHandler, databaseHandler);
+        checkCommand = new CheckCommand(configHandler, databaseHandler, timeTracker);
+        checkOthersCommand = new CheckOthersCommand(timeTracker, configHandler, databaseHandler);
         helpCommand = new HelpCommand(configHandler);
         removeTimeCommand = new RemoveTimeCommand(logger, configHandler, databaseHandler);
         topCommand = new TopCommand(configHandler, databaseHandler);

@@ -1,11 +1,10 @@
 package me.umbreon.xcraftontime.events;
 
-import com.earth2me.essentials.Essentials;
+import me.umbreon.xcraftontime.TimeTracker;
 import me.umbreon.xcraftontime.handlers.ConfigHandler;
 import me.umbreon.xcraftontime.handlers.DatabaseHandler;
-import me.umbreon.xcraftontime.TimeTracker;
 import net.ess3.api.events.AfkStatusChangeEvent;
-import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -17,8 +16,6 @@ public class AfkStatusChange implements Listener {
     private final DatabaseHandler databaseHandler;
     private final TimeTracker timeTracker;
     private final ConfigHandler configHandler;
-    private static Essentials essentials =
-        (Essentials) Bukkit.getServer().getPluginManager().getPlugin("Essentials");
 
     public AfkStatusChange(
         Logger logger,
@@ -32,18 +29,19 @@ public class AfkStatusChange implements Listener {
         this.configHandler = configHandler;
     }
 
-
     @EventHandler
     public void onAfkStatusChangeEvent(AfkStatusChangeEvent event) {
-        if (essentials.getUser(event.getAffected().getBase()).isAfk()) {
-            databaseHandler.initPlayer(event.getAffected().getBase());
+        Player player = event.getAffected().getBase();
+        boolean isAfk = event.getValue();
+        if (isAfk) {
+            databaseHandler.initPlayer(player);
             if (configHandler.isPluginDebugging()) {
                 logger.info(
                     String.format(configHandler.playerIsNotAFK(), event.getAffected().getName())
                 );
             }
         } else {
-            timeTracker.savePlayerTime(event.getAffected().getBase().getUniqueId());
+            timeTracker.savePlayerTime(player.getUniqueId());
             if (configHandler.isPluginDebugging()) {
                 logger.info(
                     String.format(configHandler.playerIsAFK(), event.getAffected().getName())

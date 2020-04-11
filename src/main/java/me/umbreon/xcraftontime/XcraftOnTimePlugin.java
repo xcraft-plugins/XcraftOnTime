@@ -5,6 +5,7 @@ import me.umbreon.xcraftontime.events.PlayerListener;
 import me.umbreon.xcraftontime.handlers.CommandHandler;
 import me.umbreon.xcraftontime.handlers.ConfigHandler;
 import me.umbreon.xcraftontime.handlers.DatabaseHandler;
+import me.umbreon.xcraftontime.utils.EssentialsUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,16 +23,20 @@ public class XcraftOnTimePlugin extends JavaPlugin {
         databaseHandler = new DatabaseHandler(getLogger(), configHandler);
         timeTracker = new TimeTracker(this, databaseHandler, configHandler);
 
+        PluginManager pluginManager = Bukkit.getServer().getPluginManager();
+        EssentialsUtils essentials = new EssentialsUtils(pluginManager);
+
         initDatabase();
 
         // register events
-        PluginManager pluginManager = Bukkit.getServer().getPluginManager();
         pluginManager.registerEvents(
             new PlayerListener(getLogger(), databaseHandler, timeTracker, configHandler), this
         );
-        pluginManager.registerEvents(
-            new AfkStatusChange(getLogger(), timeTracker, databaseHandler, configHandler), this
-        );
+        if(essentials.isEnabled()) {
+            pluginManager.registerEvents(
+                new AfkStatusChange(getLogger(), timeTracker, databaseHandler, configHandler), this
+            );
+        }
 
         // register command handler
         getCommand("ontime").setExecutor(
